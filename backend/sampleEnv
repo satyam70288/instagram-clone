@@ -1,0 +1,5 @@
+MONGO_URI=mongodb+srv://satyamb971:tqEKEmhQxoThsRnm@cluster0.en2eu.mongodb.net/
+# MONGO_URI=mongodb+srv://satyamb971:tqEKEmhQxoThsRnm@cluster0.en2eu.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+# MONGO_URI=mongodb://127.0.0.1:27017/instagramClone
+PORT=8000
+SECRET_KEY=SATYAMBHARTI
