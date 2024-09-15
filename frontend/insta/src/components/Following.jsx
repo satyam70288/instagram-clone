@@ -3,29 +3,37 @@ import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import { Button } from './ui/button'
+import { useGetFollowingOrFollowerQuery } from '@/services/api'
 
 const Following = () => {
     const [following,setFollowing] = useState([])
     const params = useParams();
     const userId = params.id;
 
-    const getFollowingFollowers = async () => {
-        try {
-            const res = await axios.get(`http://localhost:8000/api/v1/user/getFollowingOrFollower/${userId}`, { withCredentials: true });
-            if (res.data.success) {
-                toast.success(res.data.message);
-                setFollowing(res.data.following)
-                console.log(res.data)
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    }
-
+    // const getFollowingFollowers = async () => {
+    //     try {
+    //         const res = await axios.get(`http://localhost:8000/api/v1/user/getFollowingOrFollower/${userId}`, { withCredentials: true });
+    //         if (res.data.success) {
+    //             toast.success(res.data.message);
+    //             setFollowing(res.data.following)
+    //             console.log(res.data)
+    //         }
+    //     } catch (error) {
+    //         console.log(error);
+    //     }
+    // }
+    const { data, error, isLoading, isSuccess } = useGetFollowingOrFollowerQuery(userId);
+    console.log(data)
     useEffect(() => {
-        getFollowingFollowers();
-    },[])
-
+        if (isSuccess) {
+          toast.success(data.message);
+          setFollowing(data.following);
+          console.log(data);
+        } else if (error) {
+          console.error('Error fetching data:', error);
+        }
+      }, [isSuccess, data, error]);
+    
     return (
         <div className="ml-[16%] w-[calc(100%-16%)] h-screen flex justify-center items-center bg-[#121212]/80 backdrop-blur-lg">
             <div className="bg-gray-800 rounded-lg max-w-md w-full p-4">

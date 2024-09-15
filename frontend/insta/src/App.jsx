@@ -17,6 +17,7 @@ import ReelsPage from './components/ReelsPage'
 import Explore from './components/Explore'
 import Followers from './components/Followers'
 import Following from './components/Following'
+import ExploreDetails from './components/ExploreDetails'
 const browserRouter = createBrowserRouter([
   {
     path: "/",
@@ -53,6 +54,10 @@ const browserRouter = createBrowserRouter([
       {
         path: 'profile/:id/following',
         element: <ProtectedRoutes><Following /></ProtectedRoutes>
+      },
+      {
+        path: 'post/:id',
+        element: <ProtectedRoutes><ExploreDetails /></ProtectedRoutes>
       },
 
 

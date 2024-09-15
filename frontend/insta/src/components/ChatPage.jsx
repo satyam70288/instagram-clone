@@ -37,13 +37,13 @@ const ChatPage = () => {
     },[]);
 
     return (
-        <div className='flex ml-[16%] h-screen scrollbar-hide'
+        <div className='flex ml-[16%] h-screen scrollbar-hide '
             style={{
                 scrollbarWidth: 'none', /* Firefox */
                 msOverflowStyle: 'none', /* IE and Edge */
             }}
         >
-            <section className='w-full md:w-1/4 sm:w-1/3 '>
+            <section className='w-full md:w-1/4 sm:w-1/3 border-r-2 '>
                 <h1 className='font-bold text-3xl mb-4 px-3 '>{user?.username}</h1>
                 <hr className='mb-4 border-gray-300' />
                 <div className='overflow-y-auto h-[80vh]' 

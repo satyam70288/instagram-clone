@@ -8,7 +8,6 @@ export function cn(...inputs) {
 export const readFileAsDataURL = (file) => {
   return new Promise((resolve) => {
     const reader = new FileReader();
-    console.log(reader)
     reader.onloadend = () => {
       if (typeof reader.result === 'string') resolve(reader.result);
     }

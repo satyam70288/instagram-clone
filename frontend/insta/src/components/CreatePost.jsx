@@ -21,15 +21,29 @@ const CreatePost = ({ open, setOpen }) => {
   const { posts } = useSelector(store => store.post);
   const dispatch = useDispatch();
 
+  // const fileChangeHandler = async (e) => {
+  //   const file = e.target.files?.[0];
+  //   if (file) {
+  //     setFile(file);
+  //     const dataUrl = await readFileAsDataURL(file);
+  //     console.log(dataUrl)
+  //     setImagePreview(dataUrl);
+  //   }
+  // }
   const fileChangeHandler = async (e) => {
     const file = e.target.files?.[0];
     if (file) {
       setFile(file);
-      const dataUrl = await readFileAsDataURL(file);
-      console.log(dataUrl)
-      setImagePreview(dataUrl);
+      if (file.type.startsWith('image/')) {
+        const dataUrl = await readFileAsDataURL(file);
+        setImagePreview(dataUrl);
+      } else if (file.type.startsWith('video/')) {
+        const videoUrl = URL.createObjectURL(file);
+        setImagePreview(videoUrl);
+      }
     }
-  }
+  };
+
 
   const createPostHandler = async (e) => {
     console.log(Cookies.get('token'));
@@ -78,7 +92,11 @@ const CreatePost = ({ open, setOpen }) => {
           {
             imagePreview && (
               <div className='w-full h-64 flex items-center justify-center'>
-                <img src={imagePreview} alt="preview_img" className='object-cover h-full w-full rounded-md' />
+                {file.type.startsWith('image/') ? (
+                  <img src={imagePreview} alt="preview" className='object-cover h-full w-full rounded-md' />
+                ) : file.type.startsWith('video/') ? (
+                  <video src={imagePreview} controls className='h-full w-full rounded-md' />
+                ) : null}
               </div>
             )
           }

@@ -17,7 +17,7 @@ const CreateStory = ({ open, setOpen, user }) => {
     const [caption, setCaption] = useState("");
     const [imagePreview, setImagePreview] = useState(null);
     const { stories } = useSelector((state) => state.story);
-    const navigate=useNavigate()
+    const navigate = useNavigate()
     console.log("first", stories);
     const fileChangeHandler = async (e) => {
         const file = e.target.files?.[0];
@@ -32,7 +32,7 @@ const CreateStory = ({ open, setOpen, user }) => {
         const formData = new FormData();
         formData.append("caption", caption);
         if (file) formData.append("post", file);
-    
+
         try {
             const res = await axios.post('http://localhost:8000/api/v1/story/create', formData, {
                 headers: {
@@ -40,7 +40,7 @@ const CreateStory = ({ open, setOpen, user }) => {
                 },
                 withCredentials: true
             });
-        
+
             if (res.data.success) {
                 dispatch(setStories([res.data.savedStory, ...stories])); // Update state
                 toast.success(res.data.message);
@@ -53,7 +53,7 @@ const CreateStory = ({ open, setOpen, user }) => {
             toast.error(error.response?.data?.message || 'An unexpected error occurred.');
         }
     };
-    
+
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -70,6 +70,14 @@ const CreateStory = ({ open, setOpen, user }) => {
                     <input ref={imageRef} type="file" className='hidden' onChange={fileChangeHandler} />
                     <input type="text" placeholder="Caption" className='w-full border p-2 rounded-md outline-none border-none' onChange={(e) => setCaption(e.target.value)} />
                     <Button onClick={() => imageRef.current.click()}>Select from Computer</Button>
+                    {
+                        imagePreview && (
+                            <div className='w-full h-64 flex items-center justify-center'>
+                                <img src={imagePreview} alt="preview_img" className='object-cover h-full w-full rounded-md' />
+                            </div>
+                        )
+                    }
+
                     <div className="flex-1">
                         <Button onClick={createPostHandler}>Create Story</Button>
                     </div>

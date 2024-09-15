@@ -5,6 +5,7 @@ import { Button } from './button';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { Link, useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 const SignUp = () => {
   const navigate=useNavigate()
