@@ -2,7 +2,7 @@ import express from "express";
 import isAuthenticated from "../middlewares/isAuthenticated.js";
 import storage from "../middlewares/storage.js";
 
-import { addComment, addNewPost, bookmarkPost, deletePost, dislikePost, getAllPost, getCommentsOfPost, getUserPost, likePost } from "../controllers/post.controller.js";
+import { addComment, addNewPost, bookmarkPost, deletePost, dislikePost, getAllPost, getCommentsOfPost, getUserPost, likePost,explorePosts } from "../controllers/post.controller.js";
 
 const router = express.Router();
 const upload = storage('image')
@@ -16,6 +16,7 @@ router.route("/:id/comment").post(isAuthenticated, addComment);
 router.route("/:id/comment/all").post(isAuthenticated, getCommentsOfPost);
 router.route("/delete/:id").delete(isAuthenticated, deletePost);
 router.route("/:id/bookmark").get(isAuthenticated, bookmarkPost);
+router.route('/explore').get(isAuthenticated, explorePosts);
 
 export default router;
 

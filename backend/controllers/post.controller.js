@@ -5,13 +5,13 @@ import { User } from "../models/user.model.js";
 import { Comment } from "../models/comment.model.js";
 import { getReceiverSocketId } from "../socket/socket.js";
 import {io} from '../index.js'
+import { register } from "./user.controller.js";
 
 export const addNewPost = async (req, res) => {
     try {
         const { caption } = req.body;
         const image = req.file;
         const authorId = req.id;
-        console.log(image)
 
         // if (!image) return res.status(400).json({ message: 'Image required' });
 
@@ -261,3 +261,59 @@ export const bookmarkPost = async (req,res) => {
         console.log(error);
     }
 }
+
+export const _explorePosts = async (req, res) => {
+    const { type, limit, tag } = req.query;
+
+    try {
+        let query = {};
+      console.log(type)
+        // Filter by tags if provided
+        if (tag) {
+            query.tags = tag;
+        }
+
+        // Ensure limit is a number and default to 10 if not provided
+        const postLimit = parseInt(limit) || 10;
+
+        let posts;
+
+        switch (type) {
+            case 'random':
+                // Fetch random posts
+                posts = await Post.aggregate([{ $sample: { size: postLimit } }]);
+                break;
+            case 'most_liked':
+                // Fetch posts sorted by likes in descending order
+                posts = await Post.find(query).sort({ likes: -1 }).limit(postLimit);
+                break;
+            case 'most_viewed':
+                // Fetch posts sorted by views in descending order
+                posts = await Post.find(query).sort({ views: -1 }).limit(postLimit);
+                break;
+            default:
+                // Default case: fetch recent posts
+                posts = await Post.find(query).limit(postLimit);
+                break;
+        }
+
+        res.json(posts);
+    } catch (err) {
+        console.error(err); // Log the error for debugging purposes
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+export const explorePosts = async (req, res) => {
+    try {
+        const loggedInUserId = req.id; // Assuming user ID is in req.user.id
+
+        // Fetch posts excluding those authored by the logged-in user
+        const posts = await Post.find({ author: { $ne: loggedInUserId } });
+
+        return res.status(200).json({ success: true, posts });
+    } catch (error) {
+        console.error(error); // Log the error for debugging purposes
+        return res.status(500).json({ success: false, message: 'Server Error' });
+    }
+};

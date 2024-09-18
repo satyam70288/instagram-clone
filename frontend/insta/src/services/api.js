@@ -24,11 +24,21 @@ export const apiSlice = createApi({
       // Provide this tag for caching the query result
       providesTags: ['User'],
     }),
+    explorePost: builder.query({
+      query: () => ({
+        url: `/post/explore`,
+        method: 'GET',
+        credentials: 'include',
+      }),
+      // Provide this tag for caching the query result
+      providesTags: ['Posts'],
+    }),
     // Define other endpoints here
   }),
 });
 
 export const { 
   useFollowOrUnfollowUserMutation, 
-  useGetFollowingOrFollowerQuery 
+  useGetFollowingOrFollowerQuery,
+  useExplorePostQuery // Export the hook for the explorePost query
 } = apiSlice;

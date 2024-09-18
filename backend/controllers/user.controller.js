@@ -35,8 +35,8 @@ export const register = async (req, res) => {
         });
 
         // Send success response
-        res.status(200).json(new ApiResponse(200,  {newUser}, "Account created successfully.",
-))
+        res.status(200).json(new ApiResponse(200, { newUser }, "Account created successfully.",
+        ))
 
 
     } catch (error) {
@@ -125,7 +125,7 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
-
+        console.log(req.body)
         // Check if email and password are provided
         if (!email || !password) {
             return res.status(400).json({
@@ -177,14 +177,15 @@ export const login = async (req, res) => {
 
         // Set the token as a cookie and also send it in the response headers
         return res
-        .header('Authorization', `Bearer ${token}`)
-        .cookie('token', token, { httpOnly: true, sameSite: 'strict', maxAge: 24 * 60 * 60 * 1000 })
-        .json({
-          message: `Welcome back ${user.username}`,
-          success: true,
-          user
-        })}
-       catch (error) {
+            .header('Authorization', `Bearer ${token}`)
+            .cookie('token', token, { httpOnly: true, sameSite: 'strict', maxAge: 24 * 60 * 60 * 1000 })
+            .json({
+                message: `Welcome back ${user.username}`,
+                success: true,
+                user
+            })
+    }
+    catch (error) {
         console.error("Error during login:", error);
         return res.status(500).json({
             message: "An unexpected error occurred. Please try again later.",
@@ -207,7 +208,7 @@ export const getProfile = async (req, res) => {
         const userId = req.params.id;
         console.log(userId);
         let user = await User.findById(userId)
-        .populate({path:'posts', createdAt:-1}).populate('bookmarks');
+            .populate({ path: 'posts', createdAt: -1 }).populate('bookmarks');
         return res.status(200).json({
             user,
             success: true
@@ -225,10 +226,10 @@ export const editProfile = async (req, res) => {
         console.log(profilePicture)
         let cloudResponse;
 
-// if (profilePicture) {
-            // const fileUri = getDataUri(profilePicture);
-            // cloudResponse = await cloudinary.uploader.upload(fileUri);
-            // const fileUri=;
+        // if (profilePicture) {
+        // const fileUri = getDataUri(profilePicture);
+        // cloudResponse = await cloudinary.uploader.upload(fileUri);
+        // const fileUri=;
         // }
 
         const user = await User.findById(userId).select('-password');
@@ -312,7 +313,6 @@ export const followOrUnfollow = async (req, res) => {
     }
 }
 
-// controllers/userController.js
 
 
 export const getUserRelations = async (req, res) => {
@@ -321,7 +321,7 @@ export const getUserRelations = async (req, res) => {
 
         // Fetch the user by ID
         const user = await User.findById(userId).select('followers following');
-        
+
         if (!user) {
             return res.status(404).json({
                 message: 'User not found',
@@ -347,3 +347,36 @@ export const getUserRelations = async (req, res) => {
         });
     }
 };
+
+
+export const searchUser = async (req, res) => {
+    try {
+        console.log(req.query);
+        const { query } = req.query;
+
+        // Basic validation to check if the query exists
+        if (!query || query.trim() === '') {
+            return res.status(400).json({ message: 'Search query cannot be empty' });
+        }
+
+        // Perform search in the username and email fields
+        const users = await User.find({
+            $or: [
+                { username: { $regex: query, $options: 'i' } }, // Case-insensitive search
+                { email: { $regex: query, $options: 'i' } }
+            ]
+        });
+
+        // Check if users were found
+        if (users.length === 0) {
+            return res.status(404).json({ message: 'No users found' });
+        }
+
+        // Return the found users
+        res.status(200).json({ users });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
