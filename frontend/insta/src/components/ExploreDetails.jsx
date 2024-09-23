@@ -20,7 +20,6 @@ const ExploreDetails = () => {
     const { user } = useSelector((state) => state.auth)
 
     const isCurrentlyFollowing = foundPost.author.followers.includes(user._id); // Ensure user._id is defined
-    console.log(isCurrentlyFollowing)
     const [followOrUnfollowUser,isLoading] = useFollowOrUnfollowUserMutation(); // Use the hook to get the mutation function
 
     // Ensure foundPost is defined before accessing its properties

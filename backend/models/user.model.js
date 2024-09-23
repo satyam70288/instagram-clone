@@ -10,6 +10,7 @@ const userSchema = new mongoose.Schema({
     followers:[{type:mongoose.Schema.Types.ObjectId, ref:'User'}],
     following:[{type:mongoose.Schema.Types.ObjectId, ref:'User'}],
     posts:[{type:mongoose.Schema.Types.ObjectId, ref:'Post'}],
-    bookmarks:[{type:mongoose.Schema.Types.ObjectId, ref:'Post'}]
+    bookmarks:[{type:mongoose.Schema.Types.ObjectId, ref:'Post'}],
+    lastLoginAt: { type: Date, default: Date.now } // New field for tracking login time
 },{timestamps:true});
 export const User = mongoose.model('User', userSchema);

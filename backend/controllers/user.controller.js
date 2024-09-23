@@ -125,7 +125,6 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
-        console.log(req.body)
         // Check if email and password are provided
         if (!email || !password) {
             return res.status(400).json({
@@ -135,7 +134,7 @@ export const login = async (req, res) => {
         }
 
         // Find user by email
-        let user = await User.findOne({ email });
+        let user = await User.findOne({ email }).populate('posts'); // Automatically populates user's posts
         if (!user) {
             return res.status(401).json({
                 message: "Incorrect email or password.",
@@ -152,19 +151,15 @@ export const login = async (req, res) => {
             });
         }
 
+        // Update lastLoginAt to current time
+        user.lastLoginAt = Date.now();
+        await user.save();
+
         // Generate JWT token
         const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: '1d' });
 
-        // Populate user's posts if they exist
-        const populatedPosts = await Promise.all(
-            user.posts.map(async (postId) => {
-                const post = await Post.findById(postId);
-                return post.author.equals(user._id) ? post : null;
-            })
-        );
-
-        // Prepare the user data to send back
-        user = {
+        // Prepare the user data to send back (excluding sensitive data like password)
+        const userData = {
             _id: user._id,
             username: user.username,
             email: user.email,
@@ -172,7 +167,8 @@ export const login = async (req, res) => {
             bio: user.bio,
             followers: user.followers,
             following: user.following,
-            posts: populatedPosts.filter(post => post !== null) // Filter out any null values
+            posts: user.posts, // Already populated posts
+            lastLoginAt: user.lastLoginAt
         };
 
         // Set the token as a cookie and also send it in the response headers
@@ -182,17 +178,17 @@ export const login = async (req, res) => {
             .json({
                 message: `Welcome back ${user.username}`,
                 success: true,
-                user
-            })
-    }
-    catch (error) {
+                user: userData
+            });
+    } catch (error) {
         console.error("Error during login:", error);
         return res.status(500).json({
             message: "An unexpected error occurred. Please try again later.",
             success: false,
         });
     }
-}
+};
+
 export const logout = async (_, res) => {
     try {
         return res.cookie("token", "", { maxAge: 0 }).json({
@@ -351,12 +347,12 @@ export const getUserRelations = async (req, res) => {
 
 export const searchUser = async (req, res) => {
     try {
-        console.log(req.query);
         const { query } = req.query;
 
-        // Basic validation to check if the query exists
+        // If the query is empty, return all users
         if (!query || query.trim() === '') {
-            return res.status(400).json({ message: 'Search query cannot be empty' });
+            const users = await User.find().select('-password'); // Exclude password for security
+            return res.status(200).json({ users });
         }
 
         // Perform search in the username and email fields

@@ -28,7 +28,6 @@ const EditProfile = () => {
     }
 
     const selectChangeHandler = (e) => {
-        console.log(e.target.value)
         setInput({ ...input, gender: e.target.value });
     }
 

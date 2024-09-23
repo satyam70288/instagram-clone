@@ -18,7 +18,6 @@ const CreateStory = ({ open, setOpen, user }) => {
     const [imagePreview, setImagePreview] = useState(null);
     const { stories } = useSelector((state) => state.story);
     const navigate = useNavigate()
-    console.log("first", stories);
     const fileChangeHandler = async (e) => {
         const file = e.target.files?.[0];
         if (file) {

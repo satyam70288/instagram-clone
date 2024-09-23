@@ -3,42 +3,47 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 export const apiSlice = createApi({
   reducerPath: 'api',
-  baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:8000/api/v1' }),
+  baseQuery: fetchBaseQuery({ 
+    baseUrl: 'http://localhost:8000/api/v1',
+    credentials: 'include', // Set credentials at the base query level
+  }),
   endpoints: (builder) => ({
     followOrUnfollowUser: builder.mutation({
       query: (id) => ({
         url: `/user/followorunfollow/${id}`,
         method: 'POST',
         body: {},
-        credentials: 'include',
       }),
-      // Tag this mutation to invalidate relevant cache
       invalidatesTags: ['User'],
     }),
     getFollowingOrFollower: builder.query({
       query: (userId) => ({
         url: `/user/getFollowingOrFollower/${userId}`,
         method: 'GET',
-        credentials: 'include',
       }),
-      // Provide this tag for caching the query result
       providesTags: ['User'],
     }),
     explorePost: builder.query({
       query: () => ({
         url: `/post/explore`,
         method: 'GET',
-        credentials: 'include',
       }),
-      // Provide this tag for caching the query result
       providesTags: ['Posts'],
     }),
-    // Define other endpoints here
+    searchUser: builder.query({
+      query: (query) => ({
+        url: `/user/search`,
+        method: 'GET',
+        params: { query }, // Append query parameters if needed
+      }),
+      providesTags: ['Users'], // Changed to 'Users' to match the context
+    }),
   }),
 });
 
 export const { 
   useFollowOrUnfollowUserMutation, 
   useGetFollowingOrFollowerQuery,
-  useExplorePostQuery // Export the hook for the explorePost query
+  useExplorePostQuery,
+  useSearchUserQuery, // Export the hook for searchUser query
 } = apiSlice;

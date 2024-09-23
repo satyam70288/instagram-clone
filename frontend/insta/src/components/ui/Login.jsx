@@ -6,13 +6,13 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import  {setAuthUser}  from '@/redux/authSlice';
+import { setAuthUser } from '@/redux/authSlice';
 import Cookies from 'js-cookie';  // Import js-cookie
 
 const Login = () => {
-  const dispatch=useDispatch()
-  const navigate=useNavigate()
-  const {user}=useSelector(store=>store.auth)
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+  const { user } = useSelector(store => store.auth)
   const [input, setInput] = useState({
     email: "",
     password: ""
@@ -29,7 +29,7 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     try {
       setLoading(true);
       const res = await axios.post('http://localhost:8000/api/v1/user/login', input, {
@@ -38,17 +38,18 @@ const Login = () => {
         },
         withCredentials: true
       });
-  
+
       if (res.data.success) {
-         dispatch(setAuthUser(res.data.user))
-         console.log(res.headers['authorization'])
-         const token = res.headers['authorization'].split(' ')[1];
-      
-         // Store the token in localStorage
-         localStorage.setItem('authToken', token);
+        dispatch(setAuthUser(res.data.user))
+        console.log(res.headers['authorization'])
+        const token = res.headers['authorization'].split(' ')[1];
+        Cookies.set('token', token, { expires: 1, sameSite: 'Lax' });
+        
+        // Store the token in localStorage
+        localStorage.setItem('authToken', token);
         //  
-         console.log('Token stored in localStorage:', token);
-           toast.success(res.data.message || 'Login successful!');
+        console.log('Token stored in localStorage:', token);
+        toast.success(res.data.message || 'Login successful!');
         navigate('/');
         console.log('Login successful:', res.data);
       } else {
@@ -62,9 +63,9 @@ const Login = () => {
       setLoading(false);
     }
   };
-  
+
   useEffect(() => {
-    if(user){
+    if (user) {
       navigate('/')
     }
   })
@@ -77,21 +78,21 @@ const Login = () => {
         </div>
         <div>
           <Label className='py-2 font-medium' htmlFor='email'>Email</Label>
-          <Input 
-            type="email" 
-            name="email" 
-            value={input.email} 
-            onChange={handleChange} 
+          <Input
+            type="email"
+            name="email"
+            value={input.email}
+            onChange={handleChange}
             className='focus-visible:ring-transparent'
           />
         </div>
         <div>
           <Label className='py-2 font-medium' htmlFor='password'>Password</Label>
-          <Input 
-            type="password" 
-            name="password" 
-            value={input.password} 
-            onChange={handleChange} 
+          <Input
+            type="password"
+            name="password"
+            value={input.password}
+            onChange={handleChange}
             className='focus-visible:ring-transparent'
           />
         </div>

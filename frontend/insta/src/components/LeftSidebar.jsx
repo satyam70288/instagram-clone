@@ -1,28 +1,30 @@
-import React, { useState } from 'react'
-import { Heart, Home, LogOut, MessageCircle, PlusSquare, Search, SquarePlay, TrendingUp } from 'lucide-react'
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { toast } from 'sonner'
-import { useNavigate } from 'react-router-dom'
-import axios from 'axios'
-import { useDispatch, useSelector } from 'react-redux'
-import CreatePost from './CreatePost'
-import { Popover, PopoverContent } from './ui/popover'
-import { PopoverTrigger } from '@radix-ui/react-popover'
+import React, { useState } from 'react';
+import { Heart, Home, LogOut, MessageCircle, PlusSquare, Search, SquarePlay, TrendingUp } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { useDispatch, useSelector } from 'react-redux';
+import CreatePost from './CreatePost';
+import { Popover, PopoverContent } from './ui/popover';
+import { PopoverTrigger } from '@radix-ui/react-popover';
 
-import { Button } from './ui/button'
-import { setAuthUser } from '@/redux/authSlice'
-import { setPosts, setSelectedPost } from '@/redux/postSlice'
+import { Button } from './ui/button';
+import { setAuthUser } from '@/redux/authSlice';
+import { setPosts, setSelectedPost } from '@/redux/postSlice';
+import SearchPage from './SearchPage';
+
 const LeftSidebar = () => {
     const navigate = useNavigate();
     const [open, setOpen] = useState(false);
-    const { user } = useSelector(state => state.auth)
-    const dispatch=useDispatch()
-    const { likeNotification } = useSelector(state => state.realTimeNotification)
+    const [searchActive, setSearchActive] = useState(false); // New state for SearchPage
+    const { user } = useSelector(state => state.auth);
+    const dispatch = useDispatch();
+    const { likeNotification } = useSelector(state => state.realTimeNotification);
+
     const logOutHandler = async () => {
         try {
-            console.log("first")
             const res = await axios.get('http://localhost:8000/api/v1/user/logout', { withCredentials: true });
-            console.log(res.data);
             if (res.data.success) {
                 dispatch(setAuthUser(null));
                 dispatch(setSelectedPost(null));
@@ -31,10 +33,11 @@ const LeftSidebar = () => {
                 toast.success(res.data.message);
             }
         } catch (error) {
-            console.log(error.response)
+            console.log(error.response);
             toast.error(error.response?.data?.message || 'Logout failed');
         }
     };
+
     const sidebarHandler = (textType) => {
         if (textType === 'Logout') {
             logOutHandler();
@@ -46,26 +49,24 @@ const LeftSidebar = () => {
             navigate("/");
         } else if (textType === 'Messages') {
             navigate("/chat");
-        }
-        else if(textType === 'Reels'){
+        } else if (textType === 'Reels') {
             navigate("/reels");
-        }
-        else if(textType === 'Explore'){  
+        } else if (textType === 'Explore') {
             navigate("/explore");
+        } 
+        else if (textType === 'Search') {
+            setSearchActive(true); // Activate the search page when "Search" is clicked
         }
-
-
-    }
+    };
 
     const sidebarItems = [
         { icon: <Home />, text: "Home" },
-        { icon: <Search />, text: "Search" },
+        { icon: <Search />, text: "Search" }, // Search page
         { icon: <TrendingUp />, text: "Explore" },
         { icon: <MessageCircle />, text: "Messages" },
         { icon: <Heart />, text: "Notifications" },
         { icon: <PlusSquare />, text: "Create" },
-        {
-            icon: <SquarePlay/>, text: "Reels"},
+        { icon: <SquarePlay />, text: "Reels" },
         {
             icon: (
                 <Avatar className='w-6 h-6'>
@@ -76,10 +77,10 @@ const LeftSidebar = () => {
             text: "Profile"
         },
         { icon: <LogOut />, text: "Logout" },
-    ]
+    ];
 
     return (
-        <div className='fixed top-0 z-10 left-0 px-4 w-[16%] h-screen border-r border-gray-300 bg-[#1C1C1C] text-white'>
+        <div className="hidden md:w-[17%] lg:block md:fixed top-0 z-10 left-0 px-4 w-[16%] h-screen border-r border-gray-300 bg-[#1C1C1C] text-white">
             <div className='flex flex-col '>
                 <h1 className='my-8 font-bold text-xl'>LOGO</h1>
                 <div className=''>
@@ -109,11 +110,10 @@ const LeftSidebar = () => {
                                                                         </Avatar>
                                                                         <p className='text-sm'><span className='font-bold'>{notification.userDetails?.username}</span> liked your post</p>
                                                                     </div>
-                                                                )
+                                                                );
                                                             })
                                                         )
                                                     }
-
                                                 </div>
                                             </PopoverContent>
                                         </Popover>
@@ -122,13 +122,15 @@ const LeftSidebar = () => {
                             </div>
                         ))
                     }
-
                 </div>
-
             </div>
+
+            {/* Conditionally render SearchPage if search is active */}
+            {searchActive && <SearchPage searchActive={searchActive} setSearchActive={setSearchActive} />}
+
             <CreatePost open={open} setOpen={setOpen} />
         </div>
-    )
-}
+    );
+};
 
-export default LeftSidebar
+export default LeftSidebar;

@@ -26,4 +26,6 @@
 .hover\:animate-border:hover {
   animation: gradientBorder 5s linear infinite;
 }
-    
+::-webkit-scrollbar{
+  @apply hidden
+}

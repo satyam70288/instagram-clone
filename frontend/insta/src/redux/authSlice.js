@@ -21,7 +21,11 @@ const authSlice = createSlice({
         },
         setSelectedUser:(state,action) => {
             state.selectedUser = action.payload;
-        }
+        },
+        removeAuthUser: (state) => {
+            state.user = null; // Reset user data when expired or logged out
+          },
+      
     }
 });
 export const {
@@ -29,5 +33,6 @@ export const {
     setSuggestedUsers, 
     setUserProfile,
     setSelectedUser,
+    removeAuthUser
 } = authSlice.actions;
 export default authSlice.reducer;

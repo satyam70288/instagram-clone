@@ -37,7 +37,7 @@ const ChatPage = () => {
     },[]);
 
     return (
-        <div className='flex ml-[16%] h-screen scrollbar-hide '
+        <div className='flex ml-[18%] h-screen scrollbar-hide '
             style={{
                 scrollbarWidth: 'none', /* Firefox */
                 msOverflowStyle: 'none', /* IE and Edge */

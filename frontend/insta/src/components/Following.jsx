@@ -23,12 +23,10 @@ const Following = () => {
     //     }
     // }
     const { data, error, isLoading, isSuccess } = useGetFollowingOrFollowerQuery(userId);
-    console.log(data)
     useEffect(() => {
         if (isSuccess) {
           toast.success(data.message);
           setFollowing(data.following);
-          console.log(data);
         } else if (error) {
           console.error('Error fetching data:', error);
         }

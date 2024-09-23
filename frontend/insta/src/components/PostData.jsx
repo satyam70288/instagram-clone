@@ -131,7 +131,7 @@ const PostData = ({ post }) => {
     };
 
     return (
-        <div className='my-8 w-full max-w-sm mx-auto border p-4 border-gray-300 bg-white rounded-lg shadow-lg transition-transform transform hover:scale-105'>
+        <div className='ml-[14%] my-8 w-full max-w-xs sm:max-w-sm md:max-w-md mx-auto border p-4 border-gray-300 bg-white rounded-lg shadow-lg'>
             <div className='flex items-center justify-between'>
                 <div className='flex items-center gap-2'>
                     <Avatar>
@@ -165,7 +165,7 @@ const PostData = ({ post }) => {
                 src={`http://localhost:8000/${post?.image.replace(/\\/g, '/')}`}
                 alt="post_img"
             /> */}
-                 {isVideo(post?.image) ? (
+            {isVideo(post?.image) ? (
                 <video
                     className='rounded-md my-2 w-full aspect-square object-cover'
                     controls

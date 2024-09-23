@@ -26,12 +26,10 @@ const Followers = () => {
     // useEffect(() => {
     //     getFollowingFollowers();
     // },[])
-    console.log(data)
     useEffect(() => {
         if (isSuccess) {
           toast.success(data.message);
           setFollower(data.followers);
-          console.log(data);
         } else if (error) {
           console.error('Error fetching data:', error);
         }
