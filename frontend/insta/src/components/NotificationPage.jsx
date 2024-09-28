@@ -1,5 +1,5 @@
 import useGetAllNotification from '@/hooks/useGetAllNotification'
-import { useNotificationQuery } from '@/services/api'
+import { useMarkAsReadMutation, useNotificationQuery } from '@/services/api'
 import React from 'react'
 
 const NotificationPage = () => {
@@ -7,7 +7,18 @@ const NotificationPage = () => {
     const { data, isLoading,  } = useNotificationQuery();
     console.log(data)
     const { notifications, loading, error } = useGetAllNotification();
+    const [markAsRead] = useMarkAsReadMutation();
 
+    const handleNotificationClick = async (id) => {
+        try {
+          // Trigger the mutation with the ID of the clicked notification
+          console.log(`Notification ${id} marked as read`);
+          await markAsRead(id).unwrap();  // Use `unwrap()` to access the resolved or rejected values directly
+          console.log(`Notification ${id} marked as read`);
+        } catch (error) {
+          console.error('Failed to mark notification as read:', error);
+        }
+      };
     const calculateTimeAgo = (date) => {
         const notificationDate = new Date(date);
         const currentDate = new Date();
@@ -41,7 +52,7 @@ const NotificationPage = () => {
                 </div>
                 {notifications.map((item) => {
                     return (
-                        <div className={`p-2 flex justify-between items-center bg-gray-800 w-full rounded-md border border-gray-700 hover:bg-gray-700 transition-colors duration-200 ${item.read ? 'bg-gray-700' : ''}`}>
+                        <div onClick={() => handleNotificationClick(item._id)} className={`p-2 flex justify-between items-center bg-gray-800 w-full rounded-md border border-gray-700 hover:bg-gray-700 transition-colors duration-200 ${item.read ? 'bg-gray-700' : ''}`}>
                             <div className='w-1/2'>{item.message}</div>
                             <div
                                 className={`w-3 h-3 rounded-full ${item.read ? 'bg-green-500' : 'bg-red-500'

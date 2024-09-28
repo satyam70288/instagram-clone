@@ -57,10 +57,10 @@ app.use("/api/v1/notification",notificationRoute);
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
 // Serve frontend if needed
-// app.use(express.static(path.join(__dirname, "frontend", "dist")));
-// app.get("*", (req, res) => {
-//     res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
-// });
+app.use(express.static(path.join(__dirname, "frontend", "dist")));
+app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
+});
 
 // Error Handling Middleware
 app.use((err, req, res, next) => {

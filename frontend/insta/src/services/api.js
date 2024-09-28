@@ -36,6 +36,15 @@ export const apiSlice = createApi({
       query: () => `/notification/all`,
       providesTags: ['User', 'Posts'], // Corrected providesTags format
     }),
+    markAsRead: builder.mutation({
+      query: (id) => ({
+        url: `/notification/update/${id}`,
+        method: 'PATCH',  // Correct the HTTP method to 'PATCH'
+        body: {},  // You can remove `body` if it's not required
+      }),
+      invalidatesTags: ['Notification'],  // Ensure this matches the tag used when fetching notifications
+    })
+    
   }),
 });
 
@@ -46,4 +55,5 @@ export const {
   useExplorePostQuery,
   useSearchUserQuery, 
   useNotificationQuery,
+  useMarkAsReadMutation
 } = apiSlice;

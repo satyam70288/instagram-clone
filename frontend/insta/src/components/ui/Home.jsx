@@ -39,30 +39,30 @@ const Home = () => {
         toast.error(error.response?.data?.message || 'Logout failed');
     }
 };
-// useEffect(() => {
-//   const checkExpiration = () => {
-//     if (user && user.lastLoginAt) {
-//       const currentTime = Date.now();
-//       const lastLoginTime = new Date(user.lastLoginAt).getTime();
-//       const expirationTime = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
-//       console.log(currentTime, lastLoginTime, expirationTime);
-//       console.log("Checking expiration");
-//       if (currentTime - lastLoginTime > expirationTime) {
-//         logOutHandler(); // Remove the user if 24 hours have passed
-//         console.log("User session expired, removing user.");
-//       }
-//     }
-//   };
+useEffect(() => {
+  const checkExpiration = () => {
+    if (user && user.lastLoginAt) {
+      const currentTime = Date.now();
+      const lastLoginTime = new Date(user.lastLoginAt).getTime();
+      const expirationTime = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+      console.log(currentTime, lastLoginTime, expirationTime);
+      console.log("Checking expiration");
+      if (currentTime - lastLoginTime > expirationTime) {
+        logOutHandler(); // Remove the user if 24 hours have passed
+        console.log("User session expired, removing user.");
+      }
+    }
+  };
 
-//   // Run the expiration check immediately
-//   checkExpiration();
+  // Run the expiration check immediately
+  checkExpiration();
 
-//   // Set an interval to run the expiration check every 5 seconds
-//   const intervalId = setInterval(checkExpiration, 5000);
+  // Set an interval to run the expiration check every 5 seconds
+  const intervalId = setInterval(checkExpiration, 500000);
 
-//   // Cleanup the interval on component unmount
-//   return () => clearInterval(intervalId);
-// }, [user]); // Add 'user' as a dependency
+  // Cleanup the interval on component unmount
+  return () => clearInterval(intervalId);
+}, [user]); // Add 'user' as a dependency
 
 
 
