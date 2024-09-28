@@ -25,6 +25,10 @@ const Profile = () => {
   const handleTabChange = (tab) => {
     setActiveTab(tab);
   }
+  const isVideo = (url) => {
+    // Check if URL ends with common video file extensions
+    return url.endsWith('.mp4') || url.endsWith('.mov') || url.endsWith('.avi');
+  };
   const folooworUnFollowHandler = async (id) => {
     try {
       const res = await axios.post(`http://localhost:8000/api/v1/user/followorunfollow/${id}`, {}, {
@@ -96,7 +100,7 @@ const Profile = () => {
                 }
               </div>
               <div className='flex items-center gap-4'>
-                <Link><p><span className='font-semibold'>{userProfile?.posts?.length} </span>posts</p></Link> 
+                <Link><p><span className='font-semibold'>{userProfile?.posts?.length} </span>posts</p></Link>
                 <Link to="followers"><p><span className='font-semibold'>{userProfile?.followers?.length} </span>followers</p></Link>
                 <Link to="following"><p><span className='font-semibold'>{userProfile?.following?.length} </span>following</p></Link>
               </div>
@@ -126,8 +130,20 @@ const Profile = () => {
               displayedPost?.map((post) => {
                 return (
                   <div key={post?._id} className='relative group cursor-pointer'>
-                    <img src={`http://localhost:8000/${post?.image.replace(/\\/g, '/')}`}
-                      alt='postimage' className='rounded-sm my-2 w-full aspect-square object-cover' />
+                    {isVideo(post?.image) ? (
+                      <video
+                        className='rounded-md my-2 w-full aspect-square object-cover'
+                        controls
+                        src={`http://localhost:8000/${post?.image.replace(/\\/g, '/')}`}
+                        alt="post_video"
+                      />
+                    ) : (
+                      <img
+                        className='rounded-md my-2 w-full aspect-square object-cover'
+                        src={`http://localhost:8000/${post?.image.replace(/\\/g, '/')}`}
+                        alt="post_image"
+                      />
+                    )}
                     <div className='absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300'>
                       <div className='flex items-center text-white space-x-4'>
                         <button className='flex items-center gap-2 hover:text-gray-300'>

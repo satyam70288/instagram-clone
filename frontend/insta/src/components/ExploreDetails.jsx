@@ -58,7 +58,7 @@ const ExploreDetails = () => {
     };
 
     return (
-        <div className='ml-[16%]  mt-1'>
+        <div className='  mt-1'>
             <Link to='/explore'><ArrowLeft size={50} /></Link>
             <div className=' h-screen flex  justify-center'>
                 <div className='grid grid-cols-2 w-[60vw] h-[80vh] shadow-2xl border-blue-950 border-4 rounded-3xl overflow-hidden'>

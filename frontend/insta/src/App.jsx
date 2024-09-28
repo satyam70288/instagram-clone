@@ -18,6 +18,7 @@ import Explore from './components/Explore'
 import Followers from './components/Followers'
 import Following from './components/Following'
 import ExploreDetails from './components/ExploreDetails'
+import NotificationPage from './components/NotificationPage'
 const browserRouter = createBrowserRouter([
   {
     path: "/",
@@ -59,7 +60,10 @@ const browserRouter = createBrowserRouter([
         path: 'post/:id',
         element: <ProtectedRoutes><ExploreDetails /></ProtectedRoutes>
       },
-
+      {
+        path: 'notifications',
+        element: <ProtectedRoutes><NotificationPage /></ProtectedRoutes>
+      },
 
     ]
   },

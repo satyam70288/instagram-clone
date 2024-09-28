@@ -13,8 +13,11 @@ import axios from 'axios'
 import { toast } from 'sonner'
 import { setPosts, setSelectedPost } from '@/redux/postSlice'
 import SearchPage from '../SearchPage'
+import { useNotificationQuery } from '@/services/api'
+import useGetAllNotification from '@/hooks/useGetAllNotification'
 
 const Home = () => {
+  useGetAllNotification()
   useGetSuggestedUsers()
   useGetAllPost()
   useGetAllStory()

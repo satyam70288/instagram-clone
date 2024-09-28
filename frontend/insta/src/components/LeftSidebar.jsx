@@ -57,6 +57,8 @@ const LeftSidebar = () => {
         else if (textType === 'Search') {
             setSearchActive(true); // Activate the search page when "Search" is clicked
         }
+        else if (textType === 'Notifications') {
+            navigate("/notifications");}
     };
 
     const sidebarItems = [

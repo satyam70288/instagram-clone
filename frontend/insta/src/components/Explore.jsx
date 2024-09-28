@@ -12,7 +12,7 @@ const Explore = () => {
   };
 
   return (
-    <div className="ml-[19%] w-[calc(100%-16%)] h-screen overflow-y-auto bg-gray-900">
+    <div className="ml-[16%] w-[calc(100%-16%)] h-screen overflow-y-auto bg-gray-900 p-2">
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 p-4">
         {data?.posts.map((item) => (
           <Link

@@ -5,7 +5,7 @@ export const apiSlice = createApi({
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({ 
     baseUrl: 'http://localhost:8000/api/v1',
-    credentials: 'include', // Set credentials at the base query level
+    credentials: 'include',
   }),
   endpoints: (builder) => ({
     followOrUnfollowUser: builder.mutation({
@@ -17,33 +17,33 @@ export const apiSlice = createApi({
       invalidatesTags: ['User'],
     }),
     getFollowingOrFollower: builder.query({
-      query: (userId) => ({
-        url: `/user/getFollowingOrFollower/${userId}`,
-        method: 'GET',
-      }),
+      query: (userId) => `/user/getFollowingOrFollower/${userId}`,
       providesTags: ['User'],
     }),
     explorePost: builder.query({
-      query: () => ({
-        url: `/post/explore`,
-        method: 'GET',
-      }),
+      query: () => `/post/explore`,
       providesTags: ['Posts'],
     }),
     searchUser: builder.query({
       query: (query) => ({
-        url: `/user/search`,
+        url: '/user/search',
         method: 'GET',
-        params: { query }, // Append query parameters if needed
+        params: { query },
       }),
-      providesTags: ['Users'], // Changed to 'Users' to match the context
+      providesTags: ['Users'],
+    }),
+    notification: builder.query({
+      query: () => `/notification/all`,
+      providesTags: ['User', 'Posts'], // Corrected providesTags format
     }),
   }),
 });
 
+// Export hooks for usage in functional components
 export const { 
   useFollowOrUnfollowUserMutation, 
   useGetFollowingOrFollowerQuery,
   useExplorePostQuery,
-  useSearchUserQuery, // Export the hook for searchUser query
+  useSearchUserQuery, 
+  useNotificationQuery,
 } = apiSlice;

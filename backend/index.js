@@ -10,7 +10,7 @@ import connectDB from "./utils/db.js";
 import userRoute from "./routes/user.route.js";
 import postRoute from "./routes/post.route.js";
 import storyRoute from './routes/story.route.js'
-
+import notificationRoute from "./routes/notification.routes.js";
 import messageRoute from "./routes/message.route.js";
 import { initializeSocketIO } from "./socket/socket.js";
 
@@ -36,12 +36,13 @@ app.use(cookieParser());
 // app.use(urlencoded({ extended: true }));
 
 const corsOptions = {
-    origin: 'http://localhost:5173', // Adjust to your frontend URL
+    origin: '*', // Use an array to specify multiple origins
     credentials: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     allowedHeaders: 'Content-Type,Authorization',
     exposedHeaders: ['Authorization'], // Optionally expose headers to the client
 };
+
 
 app.use(cors(corsOptions));
 
@@ -50,6 +51,7 @@ app.use("/api/v1/user", userRoute);
 app.use("/api/v1/post", postRoute);
 app.use("/api/v1/message", messageRoute);
 app.use("/api/v1/story",storyRoute );
+app.use("/api/v1/notification",notificationRoute);
 
 // Static Files
 app.use('/public', express.static(path.join(__dirname, 'public')));

@@ -24,7 +24,6 @@ const StoryData = () => {
     setViewStoryOpen(true);
   };
   const viewStoryHandler = async (storyId) => {
-    console.log(storyId)
     try {
       const res = await axios.post(`http://localhost:8000/api/v1/story/view/${storyId}`, {}, {
         withCredentials: true,
