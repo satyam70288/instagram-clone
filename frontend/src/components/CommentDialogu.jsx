@@ -34,7 +34,7 @@ const CommentDialog = ({ open, setOpen }) => {
   const sendMessageHandler = async () => {
 
     try {
-      const res = await axios.post(`http://localhost:8000/api/v1/post/${selectedPost?._id}/comment`, { text }, {
+      const res = await axios.post(`https://instagram-clone-8h2b.onrender.com/api/v1/post/${selectedPost?._id}/comment`, { text }, {
         headers: {
           'Content-Type': 'application/json'
         },
@@ -63,7 +63,7 @@ const CommentDialog = ({ open, setOpen }) => {
         <div className='flex flex-1'>
           <div className='w-1/2'>
             <img
-                src={`http://localhost:8000/${selectedPost?.image.replace(/\\/g, '/')}`}
+                src={`https://instagram-clone-8h2b.onrender.com/${selectedPost?.image.replace(/\\/g, '/')}`}
                 alt="post_img"
               className='w-full h-full object-cover rounded-l-lg'
             />

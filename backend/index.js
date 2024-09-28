@@ -22,7 +22,7 @@ const app = express();
 const server = createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: 'http://localhost:5173',
+        origin: process.env.URL,
         methods: ['GET', 'POST'],
     },
 });
@@ -36,7 +36,7 @@ app.use(cookieParser());
 // app.use(urlencoded({ extended: true }));
 
 const corsOptions = {
-    origin: 'http://localhost:5173', // Use an array to specify multiple origins
+    origin: process.env.URL, // Use an array to specify multiple origins
     credentials: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     allowedHeaders: 'Content-Type,Authorization',

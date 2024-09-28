@@ -10,7 +10,7 @@ const useGetAllStory = () => {
     useEffect(() => {
         const fetchAllStory = async () => {
             try {
-                const res = await axios.get(`http://localhost:8000/api/v1/story/get/`, { withCredentials: true });
+                const res = await axios.get(`https://instagram-clone-8h2b.onrender.com/api/v1/story/get/`, { withCredentials: true });
                 if (res.data.success) {  
                     dispatch(setStories(res.data.stories));
                 }

@@ -19,7 +19,7 @@ const SuggestedUsers = () => {
 
     const followOrUnfollowHandler = async (id) => {
         try {
-            const res = await axios.post(`http://localhost:8000/api/v1/user/followorunfollow/${id}`, {}, {
+            const res = await axios.post(`https://instagram-clone-8h2b.onrender.com/api/v1/user/followorunfollow/${id}`, {}, {
                 withCredentials: true
             });
 

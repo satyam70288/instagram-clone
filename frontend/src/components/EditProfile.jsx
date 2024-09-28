@@ -41,7 +41,7 @@ const EditProfile = () => {
         }
         try {
             setLoading(true);
-            const res = await axios.post('http://localhost:8000/api/v1/user/profile/edit', formData, {
+            const res = await axios.post('https://instagram-clone-8h2b.onrender.com/api/v1/user/profile/edit', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 },
@@ -80,7 +80,7 @@ const EditProfile = () => {
                     <div className='flex gap-3 items-center'>
                         <Avatar className='w-16 h-16 rounded-full overflow-hidden'>
                             <AvatarImage
-                                src={`http://localhost:8000/${user?.profilePicture.replace(/\/{2,}/g, '/')}`}
+                                src={`https://instagram-clone-8h2b.onrender.com/${user?.profilePicture.replace(/\/{2,}/g, '/')}`}
                                 alt="profile photo"
                                 className='object-cover w-full h-full' // Ensures image covers the container
                             />

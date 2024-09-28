@@ -46,7 +46,7 @@ const Followers = () => {
                     {follower.map((item, key) => (
                             <div key={key} className="flex items-center justify-between p-2 hover:bg-gray-700 rounded-lg">
                                 <div className="flex items-center gap-3">
-                                    <img src={`http://localhost:8000/${item.profilePicture}`}  alt={item.username} className="h-10 w-10 rounded-full" />
+                                    <img src={`https://instagram-clone-8h2b.onrender.com/${item.profilePicture}`}  alt={item.username} className="h-10 w-10 rounded-full" />
                                     <span className="text-white">{item.username}</span>
                                 </div>
                                 <Button className="text-red-500">Remove</Button>

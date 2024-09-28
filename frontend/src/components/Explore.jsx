@@ -24,13 +24,13 @@ const Explore = () => {
               <video
                 className="w-full h-80 object-cover rounded-t-lg"
                 controls
-                src={`http://localhost:8000/${item?.image.replace(/\\/g, '/')}`}
+                src={`https://instagram-clone-8h2b.onrender.com/${item?.image.replace(/\\/g, '/')}`}
                 alt="post_video"
               />
             ) : (
               <img
                 className="w-full h-80 object-cover rounded-t-lg"
-                src={`http://localhost:8000/${item?.image.replace(/\\/g, '/')}`}
+                src={`https://instagram-clone-8h2b.onrender.com/${item?.image.replace(/\\/g, '/')}`}
                 alt="post_image"
               />
             )}

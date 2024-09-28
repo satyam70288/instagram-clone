@@ -18,7 +18,7 @@ const useGetAllNotification = () => {
       try {
         setLoading(true); // Set loading state to true when fetching starts
         const res = await axios.get(
-          `http://localhost:8000/api/v1/notification/all`,
+          `https://instagram-clone-8h2b.onrender.com/api/v1/notification/all`,
           { withCredentials: true }
         );
         if (res.data.success) {

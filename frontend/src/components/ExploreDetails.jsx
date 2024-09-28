@@ -65,7 +65,7 @@ const ExploreDetails = () => {
                     <div className='bg-black w-full h-full'>
                         <img
                             className='w-full h-full object-cover'
-                            src={`http://localhost:8000/${foundPost.image}`}
+                            src={`https://instagram-clone-8h2b.onrender.com/${foundPost.image}`}
                             alt={foundPost.content}
                         />
                     </div>
@@ -74,7 +74,7 @@ const ExploreDetails = () => {
                             <div className='w-12 h-12'>
                                 <Avatar>
                                     <AvatarImage
-                                        src={`http://localhost:8000/${foundPost?.author?.profilePicture}`}
+                                        src={`https://instagram-clone-8h2b.onrender.com/${foundPost?.author?.profilePicture}`}
                                         className='w-full h-full object-cover rounded-full'
                                     />
                                     <AvatarImage>CN</AvatarImage>
@@ -98,7 +98,7 @@ const ExploreDetails = () => {
                                     <div className='w-12 h-12'>
                                         <Avatar>
                                             <AvatarImage
-                                                src={`http://localhost:8000/${item?.author?.profilePicture}`}
+                                                src={`https://instagram-clone-8h2b.onrender.com/${item?.author?.profilePicture}`}
                                                 className='w-full h-full object-cover rounded-full'
                                             />
                                             <AvatarImage>CN</AvatarImage>

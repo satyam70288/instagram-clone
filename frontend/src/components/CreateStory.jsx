@@ -33,7 +33,7 @@ const CreateStory = ({ open, setOpen, user }) => {
         if (file) formData.append("post", file);
 
         try {
-            const res = await axios.post('http://localhost:8000/api/v1/story/create', formData, {
+            const res = await axios.post('https://instagram-clone-8h2b.onrender.com/v1/story/create', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 },
