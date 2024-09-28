@@ -36,7 +36,7 @@ app.use(cookieParser());
 // app.use(urlencoded({ extended: true }));
 
 const corsOptions = {
-    origin: '*', // Use an array to specify multiple origins
+    origin: 'http://localhost:5173', // Use an array to specify multiple origins
     credentials: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     allowedHeaders: 'Content-Type,Authorization',
