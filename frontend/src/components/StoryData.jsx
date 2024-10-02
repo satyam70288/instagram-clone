@@ -25,7 +25,7 @@ const StoryData = () => {
   };
   const viewStoryHandler = async (storyId) => {
     try {
-      const res = await axios.post(`https://instagram-clone-8h2b.onrender.com/api/v1/story/view/${storyId}`, {}, {
+      const res = await axios.post(`/api/v1/story/view/${storyId}`, {}, {
         withCredentials: true,
         headers: {
           'Content-Type': 'application/json'
@@ -76,7 +76,7 @@ const StoryData = () => {
               }}
             >
               <img
-                src={`https://instagram-clone-8h2b.onrender.com/${story?.media}`}
+                src={`http://localhost:8000/${story?.media}`}
                 alt="Story"
                 className='w-full h-full object-cover rounded-full'
               />

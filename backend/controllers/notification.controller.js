@@ -7,8 +7,13 @@ export const getAllNotificationForSpecificUser = async (req, res) => {
       const userId = req.id;
       console.log("userId",userId);
   
-      const notifications = await Notification.find({ fromUser: { $ne: userId } })
-        .sort({ createdAt: -1 });
+      const notifications = await Notification.find({
+        $and: [
+          { fromUser: { $ne: userId } },
+          { user: { $ne: userId } },  // Replace with your specific condition for `user`
+        ]
+      }).sort({ createdAt: -1 });
+      
   
       return res.status(200).json({
         notifications,

@@ -19,7 +19,7 @@ const SuggestedUsers = () => {
 
     const followOrUnfollowHandler = async (id) => {
         try {
-            const res = await axios.post(`https://instagram-clone-8h2b.onrender.com/api/v1/user/followorunfollow/${id}`, {}, {
+            const res = await axios.post(`/api/v1/user/followorunfollow/${id}`, {}, {
                 withCredentials: true
             });
 
@@ -72,7 +72,7 @@ const SuggestedUsers = () => {
                                 <div className='flex items-center gap-2'>
                                     <Link to={`/profile/${userData?._id}`}>
                                         <Avatar>
-                                            <AvatarImage src={userData?.profilePicture} alt="profile_picture" />
+                                            <AvatarImage src={`http://localhost:8000/${userData?.profilePicture.replace(/\/{2,}/g, '/')}`} alt="profile_picture" />
                                             <AvatarFallback>CN</AvatarFallback>
                                         </Avatar>
                                     </Link>

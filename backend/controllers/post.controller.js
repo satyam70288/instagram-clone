@@ -385,7 +385,7 @@ export const explorePosts = async (req, res) => {
         const loggedInUserId = req.id; // Assuming user ID is in req.user.id
 
         // Fetch posts excluding those authored by the logged-in user
-        const posts = await Post.find({ author: { $ne: loggedInUserId } });
+        const posts = await Post.find();
 
         return res.status(200).json({ success: true, posts });
     } catch (error) {

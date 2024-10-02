@@ -21,25 +21,65 @@ const CreatePost = ({ open, setOpen }) => {
   const { posts } = useSelector(store => store.post);
   const dispatch = useDispatch();
 
+
   // const fileChangeHandler = async (e) => {
   //   const file = e.target.files?.[0];
   //   if (file) {
   //     setFile(file);
-  //     const dataUrl = await readFileAsDataURL(file);
-  //     console.log(dataUrl)
-  //     setImagePreview(dataUrl);
+  //     if (file.type.startsWith('image/')) {
+  //       const dataUrl = await readFileAsDataURL(file);
+  //       setImagePreview(dataUrl);
+  //     } else if (file.type.startsWith('video/')) {
+  //       const videoUrl = URL.createObjectURL(file);
+  //       setImagePreview(videoUrl);
+  //     }
   //   }
-  // }
+  // };
+  const [fileError, setFileError] = useState(''); // State to manage file error messages
+
+  // Allowed file types
+  const allowedTypes = ['image/jpeg', 'image/gif', 'application/pdf', 'video/mp4'];
+
+  // Utility function to read file as data URL
+  const readFileAsDataURL = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
+  // File change handler with validation
   const fileChangeHandler = async (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setFile(file);
-      if (file.type.startsWith('image/')) {
-        const dataUrl = await readFileAsDataURL(file);
-        setImagePreview(dataUrl);
-      } else if (file.type.startsWith('video/')) {
-        const videoUrl = URL.createObjectURL(file);
-        setImagePreview(videoUrl);
+    const selectedFile = e.target.files?.[0];
+    console.log(selectedFile)
+
+    if (selectedFile) {
+      // Check if the file type is allowed
+      if (allowedTypes.includes(selectedFile.type)) {
+        setFileError(''); // Clear previous error messages
+        setFile(selectedFile);
+
+        // Handle preview based on file type
+        if (selectedFile.type.startsWith('image/')) {
+          const dataUrl = await readFileAsDataURL(selectedFile);
+          setImagePreview(dataUrl);
+        } else if (selectedFile.type.startsWith('video/')) {
+          const videoUrl = URL.createObjectURL(selectedFile);
+          setImagePreview(videoUrl);
+        } else if (selectedFile.type === 'application/pdf') {
+          const pdfUrl = URL.createObjectURL(selectedFile);
+          setImagePreview(pdfUrl);
+          console.log(pdfUrl)
+        }
+      } else {
+        // Display error if file type is not allowed
+        setFileError('Only JPG, GIF, MP4, and PDF files are allowed.');
+        setFile(null); // Clear file state
+        setImagePreview(null); // Clear preview state
+        e.target.value = null; // Reset input value to allow re-selection
+        toast.error('Only JPG, GIF, MP4, and PDF files are allowed.');
       }
     }
   };
@@ -54,7 +94,7 @@ const CreatePost = ({ open, setOpen }) => {
     console.log(formData)
     try {
       setLoading(true);
-      const res = await axios.post('https://instagram-clone-8h2b.onrender.com/api/v1/post/addpost', formData, {
+      const res = await axios.post('/api/v1/post/addpost', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         },
@@ -89,17 +129,31 @@ const CreatePost = ({ open, setOpen }) => {
             </div>
           </div>
           <Textarea value={caption} onChange={(e) => setCaption(e.target.value)} className="focus-visible:ring-transparent border-none" placeholder="Write a caption..." />
-          {
-            imagePreview && (
-              <div className='w-full h-64 flex items-center justify-center'>
-                {file.type.startsWith('image/') ? (
-                  <img src={imagePreview} alt="preview" className='object-cover h-full w-full rounded-md' />
-                ) : file.type.startsWith('video/') ? (
-                  <video src={imagePreview} controls className='h-full w-full rounded-md' />
-                ) : null}
-              </div>
-            )
-          }
+          {imagePreview && (
+            <div className='w-full h-64 flex items-center justify-center'>
+              {file.type.startsWith('image/') ? (
+                <img src={imagePreview} alt="preview" className='object-cover h-full w-full rounded-md' />
+              ) : file.type.startsWith('video/') ? (
+                <video src={imagePreview} controls className='h-full w-full rounded-md' />
+              ) : file.type === 'application/pdf' ? (
+                <embed
+                  src={imagePreview}
+                  type="application/pdf"
+                  width="100%"
+                  height="100%"
+                  className="h-full w-full rounded-md"
+                />
+              ) : (
+                <div className="text-red-500">Unsupported file type</div>
+              )}
+            </div>
+          )}
+          {fileError && (
+            <div className="text-red-600 text-sm mb-4">
+              {fileError}
+            </div>
+          )}
+
           <input ref={imageRef} type='file' className='hidden' onChange={fileChangeHandler} />
           <Button onClick={() => imageRef.current.click()} className='w-fit mx-auto bg-[#0095F6] hover:bg-[#258bcf] '>Select from computer</Button>
           {

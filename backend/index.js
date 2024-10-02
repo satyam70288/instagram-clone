@@ -36,7 +36,8 @@ app.use(cookieParser());
 // app.use(urlencoded({ extended: true }));
 
 const corsOptions = {
-    origin: process.env.URL, // Use an array to specify multiple origins
+    // origin: process.env.URL, // Use an array to specify multiple origins
+    origin : '*',
     credentials: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     allowedHeaders: 'Content-Type,Authorization',
@@ -57,10 +58,10 @@ app.use("/api/v1/notification",notificationRoute);
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
 // Serve frontend if needed
-app.use(express.static(path.join(__dirname, "frontend", "dist")));
-app.get("*", (req, res) => {
-    res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
-});
+// app.use(express.static(path.join(__dirname, "frontend", "dist")));
+// app.get("*", (req, res) => {
+//     res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
+// });
 
 // Error Handling Middleware
 app.use((err, req, res, next) => {

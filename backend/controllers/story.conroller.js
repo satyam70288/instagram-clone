@@ -2,26 +2,36 @@ import { Story } from "../models/story.model.js";
 import { User } from "../models/user.model.js";
 import ApiResponse from "../utils/ApiResponse.handler.js";
 
-export const createSory=async(req,res)=>{
-    try {
-        const { type,caption  } = req.body;
-        const userId = req.id;
-        if ( !userId) {return res.status(400).json({ message: 'Type and author are required' }) }
-        if (!req.file) {   return res.status(400).json({ message: 'Media file is required' }) }
-        const user = await User.findById(userId);
-        if (!user) {return res.status(404).json({ message: 'Author not found' }) }
-        const newStory = new Story({media: req.file.path,type,author:userId,caption});
-        const savedStory = await newStory.save();
-        return res.status(200).json({
-            savedStory,
-            success: true
-        })
-        } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: 'Server error' });
+export const createStory = async (req, res) => {
+  try {
+    const { type, caption } = req.body;
+    const userId = req.id;
+    
+    // Validate required fields
+    if (!userId || !req.file) {
+      return res.status(400).json({ message: 'User ID and media file are required.' });
     }
 
-}
+    // Check if the user exists
+    const userExists = await User.exists({ _id: userId });
+    if (!userExists) {
+      return res.status(404).json({ message: 'Author not found.' });
+    }
+
+    // Create and save the new story
+    const newStory = new Story({ media: req.file.path, type, author: userId, caption });
+    const savedStory = await newStory.save();
+
+    return res.status(200).json({
+      savedStory,
+      success: true
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Server error' });
+  }
+};
+
 export const getAllStorys = async (req, res) => {
   try {
     const now = new Date(); // Get current date and time

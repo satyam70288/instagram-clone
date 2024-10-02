@@ -1,24 +1,24 @@
 import useGetAllNotification from '@/hooks/useGetAllNotification'
+import useSeenNotification from '@/hooks/useSeenNotification';
 import { useMarkAsReadMutation, useNotificationQuery } from '@/services/api'
 import React from 'react'
 
 const NotificationPage = () => {
 
     const { data, isLoading,  } = useNotificationQuery();
-    console.log(data)
+    // console.log(data)
     const { notifications, loading, error } = useGetAllNotification();
-    const [markAsRead] = useMarkAsReadMutation();
+    const [markAsRead, ] = useMarkAsReadMutation();
 
     const handleNotificationClick = async (id) => {
-        try {
-          // Trigger the mutation with the ID of the clicked notification
-          console.log(`Notification ${id} marked as read`);
-          await markAsRead(id).unwrap();  // Use `unwrap()` to access the resolved or rejected values directly
-          console.log(`Notification ${id} marked as read`);
-        } catch (error) {
-          console.error('Failed to mark notification as read:', error);
-        }
-      };
+      try {
+        markAsRead(id)
+        console.log('Mutation successful, response:', response);
+      } catch (err) {
+        console.error('Mutation failed:', err);
+      }
+    };
+      
     const calculateTimeAgo = (date) => {
         const notificationDate = new Date(date);
         const currentDate = new Date();
@@ -41,12 +41,12 @@ const NotificationPage = () => {
     // if (error) return <div>Error loading notifications.</div>;
 
     // Check if 'data' and 'data.notifications' exist before mapping over notifications
-    if (!data || !data.notifications) return <div>No notifications available.</div>;
+    // if (!data || !data.notifications) return <div>No notifications available.</div>;
 
 
     return (
         <div className='p-5 ml-[16%] w-[calc(100%-16%)]  bg-black text-white  h-full flex items-center justify-center'>
-            <div className='flex flex-col h-[80vh] w-[40%] bg-gray-900 items-center rounded-lg shadow-lg p-5'>
+            <div className='flex flex-col h-[80vh] w-[40%] bg-gray-900 items-center rounded-lg shadow-lg p-5 overflow-y-auto'>
                 <div className='text-xl font-semibold text-center mb-4 border-b border-gray-700 pb-2'>
                     Notifications
                 </div>

@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 // import ApiError from '../utils/handler/ApiError.handler.js
 
-const maxFileSize = 10 * 1024 * 1024; // 10 MB (in bytes)
+const maxFileSize = 30 * 1024 * 1024; // 10 MB (in bytes)
 const allowedFileTypes = [
     "image/jpeg",
     "image/png",
@@ -75,5 +75,32 @@ const storage = (folderName, allowedTypes, options = {}) => multer({
     fileFilter: fileFilter(allowedTypes),
     ...options, // Merge additional options
 });
-
-export default storage;
+export const multerErrorHandler = (err, req, res, next) => {
+    if (err instanceof multer.MulterError) {
+      switch (err.code) {
+        case 'LIMIT_FILE_SIZE':
+          return res.status(413).json({ message: 'File size exceeds the maximum limit.' });
+        case 'LIMIT_UNEXPECTED_FILE':
+          return res.status(400).json({ message: `File type ${err.file?.mimetype} not allowed.` });
+        default:
+          return res.status(400).json({ message: err.message });
+      }
+    }
+    
+    // Handle other errors
+    return res.status(500).json({ message: 'An unexpected error occurred.' });
+  };
+  
+  export default storage;
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  

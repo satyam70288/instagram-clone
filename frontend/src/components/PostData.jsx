@@ -26,7 +26,10 @@ const PostData = ({ post }) => {
         // Check if URL ends with common video file extensions
         return url.endsWith('.mp4') || url.endsWith('.mov') || url.endsWith('.avi');
     };
-
+    const isPdf = (fileName) => {
+        return fileName?.toLowerCase().endsWith('.pdf');
+    };
+    
     const changeEventHandler = (e) => {
         const inputText = e.target.value;
         setText(inputText.trim() || "");
@@ -35,7 +38,7 @@ const PostData = ({ post }) => {
     const likeOrDislikeHandler = async () => {
         try {
             const action = liked ? 'dislike' : 'like';
-            const res = await axios.get(`https://instagram-clone-8h2b.onrender.com/api/v1/post/${post?._id}/${action}`, { withCredentials: true });
+            const res = await axios.get(`/api/v1/post/${post?._id}/${action}`, { withCredentials: true });
 
             if (res.data.success) {
                 const updatedLikes = liked ? postLike - 1 : postLike + 1;
@@ -57,7 +60,7 @@ const PostData = ({ post }) => {
 
     const commentHandler = async () => {
         try {
-            const res = await axios.post(`https://instagram-clone-8h2b.onrender.com/api/v1/post/${post?._id}/comment`, { text }, {
+            const res = await axios.post(`/api/v1/post/${post?._id}/comment`, { text }, {
                 headers: { 'Content-Type': 'application/json' },
                 withCredentials: true
             });
@@ -80,7 +83,7 @@ const PostData = ({ post }) => {
 
     const deletePostHandler = async () => {
         try {
-            const res = await axios.delete(`https://instagram-clone-8h2b.onrender.com/api/v1/post/delete/${post?._id}`, { withCredentials: true });
+            const res = await axios.delete(`/api/v1/post/delete/${post?._id}`, { withCredentials: true });
 
             if (res.data.success) {
                 const updatedPostData = posts.filter(postItem => postItem._id !== post?._id);
@@ -95,7 +98,7 @@ const PostData = ({ post }) => {
 
     const bookmarkHandler = async () => {
         try {
-            const res = await axios.get(`https://instagram-clone-8h2b.onrender.com/api/v1/post/${post?._id}/bookmark`, { withCredentials: true });
+            const res = await axios.get(`/api/v1/post/${post?._id}/bookmark`, { withCredentials: true });
             if (res.data.success) {
                 toast.success(res.data.message);
             }
@@ -106,7 +109,7 @@ const PostData = ({ post }) => {
 
     const followOrUnfollowHandler = async (id) => {
         try {
-            const res = await axios.post(`https://instagram-clone-8h2b.onrender.com/api/v1/user/followorunfollow/${id}`, {}, { withCredentials: true });
+            const res = await axios.post(`/api/v1/user/followorunfollow/${id}`, {}, { withCredentials: true });
 
             if (res.data.success) {
                 const isCurrentlyFollowing = post?.author?.followers.includes(user?._id);
@@ -135,7 +138,7 @@ const PostData = ({ post }) => {
             <div className='flex items-center justify-between'>
                 <div className='flex items-center gap-2'>
                     <Avatar>
-                        <AvatarImage src={`https://instagram-clone-8h2b.onrender.com/${post?.author?.profilePicture.replace(/\\/g, '/')}`} alt="post_image" />
+                        <AvatarImage src={`http://localhost:8000/${post?.author?.profilePicture.replace(/\\/g, '/')}`} alt="post_image" />
                         <AvatarFallback>CN</AvatarFallback>
                     </Avatar>
                     <div className='flex items-center gap-3'>
@@ -169,13 +172,22 @@ const PostData = ({ post }) => {
                 <video
                     className='rounded-md my-2 w-full aspect-square object-cover'
                     controls
-                    src={`https://instagram-clone-8h2b.onrender.com/${post?.image.replace(/\\/g, '/')}`}
+                    src={`http://localhost:8000/${post?.image.replace(/\\/g, '/')}`}
                     alt="post_video"
+                />
+            ) : isPdf(post?.image) ? ( // Check if the file is a PDF
+                <embed
+                    className='rounded-md my-2 w-full aspect-square'
+                    src={`http://localhost:8000/${post?.image.replace(/\\/g, '/')}`}
+                    type="application/pdf"
+                    width="100%"
+                    height="400px" // Adjust the height as needed
+                    alt="post_pdf"
                 />
             ) : (
                 <img
                     className='rounded-md my-2 w-full aspect-square object-cover'
-                    src={`https://instagram-clone-8h2b.onrender.com/${post?.image.replace(/\\/g, '/')}`}
+                    src={`http://localhost:8000/${post?.image.replace(/\\/g, '/')}`}
                     alt="post_image"
                 />
             )}

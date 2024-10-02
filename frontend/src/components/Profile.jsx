@@ -31,7 +31,7 @@ const Profile = () => {
   };
   const folooworUnFollowHandler = async (id) => {
     try {
-      const res = await axios.post(`https://instagram-clone-8h2b.onrender.com/api/v1/user/followorunfollow/${id}`, {}, {
+      const res = await axios.post(`/api/v1/user/followorunfollow/${id}`, {}, {
         withCredentials: true
       });
 
@@ -70,7 +70,7 @@ const Profile = () => {
           <section className='flex items-center justify-center'>
             <Avatar className='h-32 w-32'>
               <AvatarImage
-                src={`https://instagram-clone-8h2b.onrender.com/${userProfile?.profilePicture.replace(/\/{2,}/g, '/')}`}
+                src={`http://localhost:8000/${userProfile?.profilePicture.replace(/\/{2,}/g, '/')}`}
                 alt="profile photo"
               />
               <AvatarFallback>CN</AvatarFallback>
@@ -134,13 +134,13 @@ const Profile = () => {
                       <video
                         className='rounded-md my-2 w-full aspect-square object-cover'
                         controls
-                        src={`https://instagram-clone-8h2b.onrender.com/${post?.image.replace(/\\/g, '/')}`}
+                        src={`http://localhost:8000/${post?.image.replace(/\\/g, '/')}`}
                         alt="post_video"
                       />
                     ) : (
                       <img
                         className='rounded-md my-2 w-full aspect-square object-cover'
-                        src={`https://instagram-clone-8h2b.onrender.com/${post?.image.replace(/\\/g, '/')}`}
+                        src={`http://localhost:8000/${post?.image.replace(/\\/g, '/')}`}
                         alt="post_image"
                       />
                     )}

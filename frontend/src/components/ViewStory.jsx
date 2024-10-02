@@ -14,7 +14,7 @@ const ViewStory = ({ open, setOpen, story }) => {
         <DialogHeader className="text-center font-semibold">View Story</DialogHeader>
         <div className="flex flex-col items-center">
           <img
-            src={`https://instagram-clone-8h2b.onrender.com/${story?.media}`}
+            src={`http://localhost:8000/${story?.media}`}
             alt="Story"
             className='w-full h-full object-cover rounded-md'
           />

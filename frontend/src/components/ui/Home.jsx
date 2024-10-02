@@ -26,7 +26,7 @@ const Home = () => {
   const { user } = useSelector(store => store.auth)
   const logOutHandler = async () => {
     try {
-        const res = await axios.get('https://instagram-clone-8h2b.onrender.com/api/v1/user/logout', { withCredentials: true });
+        const res = await axios.get('/api/v1/user/logout', { withCredentials: true });
         if (res.data.success) {
             dispatch(setAuthUser(null));
             dispatch(setSelectedPost(null));
@@ -57,8 +57,8 @@ useEffect(() => {
   // Run the expiration check immediately
   checkExpiration();
 
-  // Set an interval to run the expiration check every 5 seconds
-  const intervalId = setInterval(checkExpiration, 500000);
+  // Set an interval to run the expiration check every 6 hours
+  const intervalId = setInterval(checkExpiration, 21600000);
 
   // Cleanup the interval on component unmount
   return () => clearInterval(intervalId);

@@ -3,10 +3,9 @@ import { setPosts } from "@/redux/postSlice";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { toast } from "sonner";
 
-const useGetAllNotification = () => {
-  const dispatch = useDispatch();
-  const { selectedUser } = useSelector((store) => store.auth);
+const useSeenNotification = (id) => {
 
   // Step 1: Create state variables within the hook
   const [notifications, setNotifications] = useState([]);
@@ -17,15 +16,14 @@ const useGetAllNotification = () => {
     const fetchAllNotifications = async () => {
       try {
         setLoading(true); // Set loading state to true when fetching starts
-        const res = await axios.get(
-          `/api/v1/notification/all`,
+        const res = await axios.patch(
+          `/api/v1/update/${id}`,
           { withCredentials: true }
         );
         if (res.data.success) {
             console.log(res.data);
           // Update notifications state
-          setNotifications(res.data.notifications);
-          dispatch(setMessages(res.data.messages)); // Dispatch Redux action with messages if necessary
+          toast.success(res.data.message);
         }
       } catch (error) {
         console.log(error);
@@ -36,10 +34,10 @@ const useGetAllNotification = () => {
     };
       fetchAllNotifications();
     
-  }, []);
+  }, [id]);
 
   // Step 2: Return the state variables from the custom hook
   return { notifications, loading, error };
 };
 
-export default useGetAllNotification;
+export default useSeenNotification;

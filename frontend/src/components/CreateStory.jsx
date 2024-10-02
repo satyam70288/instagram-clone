@@ -9,6 +9,7 @@ import axios from 'axios';
 import { setStories } from '@/redux/storySlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { Loader, Loader2 } from 'lucide-react';
 
 const CreateStory = ({ open, setOpen, user }) => {
     const imageRef = useRef();
@@ -17,15 +18,36 @@ const CreateStory = ({ open, setOpen, user }) => {
     const [caption, setCaption] = useState("");
     const [imagePreview, setImagePreview] = useState(null);
     const { stories } = useSelector((state) => state.story);
+    const [loading, setLoading] = useState(false);
+    const [fileError, setFileError] = useState(''); // State to manage file error messages
+
     const navigate = useNavigate()
-    const fileChangeHandler = async (e) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            setFile(file);
-            const dataUrl = await readFileAsDataURL(file);
-            setImagePreview(dataUrl);
+    const allowedTypes = ['image/jpeg', 'image/gif', 'application/pdf', 'video/mp4'];
+
+    // File change handler
+    const fileChangeHandler = (e) => {
+        const selectedFile = e.target.files[0];
+
+        if (selectedFile) {
+            if (allowedTypes.includes(selectedFile.type)) {
+                setFileError(''); // Clear any previous errors
+                setFile(selectedFile);
+
+                // Preview the selected image or video
+                const reader = new FileReader();
+                reader.onloadend = () => setImagePreview(reader.result);
+                reader.readAsDataURL(selectedFile);
+            } else {
+                // Set error message and reset the input field
+                setFileError('Only JPG, GIF, MP4, and PDF files are allowed.');
+                setFile(null); // Clear file state
+                setImagePreview(null); // Clear preview
+                e.target.value = null; // Reset input value
+                toast.error('Only JPG, GIF, MP4, and PDF files are allowed.');
+            }
         }
     };
+
 
     const createPostHandler = async () => {
         const formData = new FormData();
@@ -33,25 +55,51 @@ const CreateStory = ({ open, setOpen, user }) => {
         if (file) formData.append("post", file);
 
         try {
-            const res = await axios.post('https://instagram-clone-8h2b.onrender.com/v1/story/create', formData, {
+            setLoading(true)
+            // Send the POST request with the form data
+            const res = await axios.post('/api/v1/story/create', formData, {
                 headers: {
-                    'Content-Type': 'multipart/form-data'
+                    'Content-Type': 'multipart/form-data',
                 },
-                withCredentials: true
+                withCredentials: true,
             });
 
+            // Handle the success response
             if (res.data.success) {
                 dispatch(setStories([res.data.savedStory, ...stories])); // Update state
-                toast.success(res.data.message);
-                navigate('/');
+                setOpen(false); // Close any modal if open
+                setLoading(false);
+                toast.success(res.data.message); // Show success notification
             } else {
-                toast.error('Failed to create story.');
+                toast.error('Failed to create story.'); // Show generic error message
             }
         } catch (error) {
-            console.error('Error creating story:', error); // Log errors
-            toast.error(error.response?.data?.message || 'An unexpected error occurred.');
+            // Check if the error has a response object (i.e., if it's a server response error)
+            if (error.response) {
+                console.log(error)
+                switch (error.response.status) {
+                    case 400:
+                        toast.error(error.response.data.message || 'Bad Request: Please check your inputs.');
+                        break;
+                    case 401:
+                        toast.error('Unauthorized: Please login to continue.');
+                        break;
+                    case 500:
+                        toast.error(error.message || 'Server Error: Something went wrong on our end nho samajh aaya.');
+                        break;
+                    default:
+                        toast.error(error.response.data.message || 'An unexpected error occurred.');
+                }
+            } else {
+                // Handle network errors or other unexpected errors
+                console.error('Error creating story:', error);
+                toast.error('An unexpected error occurred. Please try again.');
+            }
+        } finally {
+            setLoading(false)
         }
     };
+
 
 
     return (
@@ -76,10 +124,22 @@ const CreateStory = ({ open, setOpen, user }) => {
                             </div>
                         )
                     }
+                    {fileError && (
+                        <div className="text-red-600 text-sm mb-4">
+                            {fileError}
+                        </div>
+                    )}
 
-                    <div className="flex-1">
-                        <Button onClick={createPostHandler}>Create Story</Button>
-                    </div>
+                    {
+                        imagePreview && (
+                            loading ? (<Button>
+                                <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                            </Button>) :
+                                (<div className="flex-1">
+                                    <Button onClick={createPostHandler}>Create Story</Button>
+                                </div>
+                                )
+                        )}
                 </div>
             </DialogContent>
         </Dialog>

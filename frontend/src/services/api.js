@@ -4,7 +4,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 export const apiSlice = createApi({
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({ 
-    baseUrl: 'https://instagram-clone-8h2b.onrender.com/api/v1',
+    baseUrl: 'http://localhost:8000/api/v1',
     credentials: 'include',
   }),
   endpoints: (builder) => ({

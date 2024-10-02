@@ -5,7 +5,6 @@ import { Link } from 'react-router-dom'; // Import Link from react-router-dom
 
 const Explore = () => {
   const { data } = useExplorePostQuery();
-
   const isVideo = (url) => {
     // Check if URL ends with common video file extensions
     return url.endsWith('.mp4') || url.endsWith('.mov') || url.endsWith('.avi');
@@ -24,13 +23,13 @@ const Explore = () => {
               <video
                 className="w-full h-80 object-cover rounded-t-lg"
                 controls
-                src={`https://instagram-clone-8h2b.onrender.com/${item?.image.replace(/\\/g, '/')}`}
+                src={`http://localhost:8000/${item?.image.replace(/\\/g, '/')}`}
                 alt="post_video"
               />
             ) : (
               <img
                 className="w-full h-80 object-cover rounded-t-lg"
-                src={`https://instagram-clone-8h2b.onrender.com/${item?.image.replace(/\\/g, '/')}`}
+                src={`http://localhost:8000/${item?.image.replace(/\\/g, '/')}`}
                 alt="post_image"
               />
             )}
