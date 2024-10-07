@@ -6,6 +6,6 @@ import isAuthenticated from "../middlewares/isAuthenticated.js";
 const router = express.Router();
 
 router.route('/all').get(isAuthenticated,getAllNotificationForSpecificUser);
-router.route('/update/:id').patch(isAuthenticated,seenNotification);
+router.route('/update/:id').put(isAuthenticated,seenNotification);
 
 export default router;

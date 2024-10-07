@@ -5,7 +5,7 @@ import { Notification } from "../models/notification.model.js";
 export const getAllNotificationForSpecificUser = async (req, res) => {
     try {
       const userId = req.id;
-      console.log("userId",userId);
+      console.log("userId2",userId);
   
       const notifications = await Notification.find({
         $and: [
@@ -32,7 +32,7 @@ export const getAllNotificationForSpecificUser = async (req, res) => {
   export const seenNotification = async (req, res) => {
     try {
       const notificationId = req.params.id;  // Get notification _id from params
-  
+      console.log("notificationId",notificationId);
       // Update the specific notification by its _id
       await Notification.updateOne(
         { _id: notificationId },             // Match notification by _id

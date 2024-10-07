@@ -9,10 +9,12 @@ import Messages from './Messages'
 import { setMessages } from '@/redux/chatSlice';
 import axios from 'axios'
 const ChatPage = () => {
-    const { user, suggestedUsers,selectedUser } = useSelector((state) => state.auth)
-    const {onlineUsers,messages}=useSelector((state)=>state.chat)
+    const { user, suggestedUsers, selectedUser } = useSelector((state) => state.auth)
+    const { onlineUsers, messages } = useSelector((state) => state.chat)
     const [textMessage, setTextMessage] = useState("");
-    const dispatch=useDispatch()
+    const dispatch = useDispatch()
+    const { menu } = useSelector(store => store.menu)
+
     const sendMessageHandler = async (receiverId) => {
         try {
             const res = await axios.post(`/api/v1/message/send/${receiverId}`, { textMessage }, {
@@ -34,28 +36,25 @@ const ChatPage = () => {
         return () => {
             dispatch(setSelectedUser(null));
         }
-    },[]);
+    }, []);
 
     return (
-        <div className='flex ml-[18%] h-screen scrollbar-hide '
-            style={{
-                scrollbarWidth: 'none', /* Firefox */
-                msOverflowStyle: 'none', /* IE and Edge */
-            }}
-        >
+        <div className={`flex ${menu ? 'ml-[5%]' : 'ml-[16%]'} h-screen scrollbar-hide transition-all duration-500 p-5`}>
+
+
             <section className='w-full md:w-1/4 sm:w-1/3 border-r-2 '>
                 <h1 className='font-bold text-3xl mb-4 px-3 '>{user?.username}</h1>
                 <hr className='mb-4 border-gray-300' />
-                <div className='overflow-y-auto h-[80vh]' 
-                style={{
-                    scrollbarWidth: 'none', /* Firefox */
-                    msOverflowStyle: 'none', /* IE and Edge */
-                }}
+                <div className='overflow-y-auto h-[80vh]'
+                    style={{
+                        scrollbarWidth: 'none', /* Firefox */
+                        msOverflowStyle: 'none', /* IE and Edge */
+                    }}
                 >
                     {
-                        suggestedUsers.map((suggestedUser) => {                            
+                        suggestedUsers.map((suggestedUser) => {
                             const isOnline = onlineUsers.includes(suggestedUser?._id);
-                            
+
                             return (
                                 <div onClick={() => dispatch(setSelectedUser(suggestedUser))} className='flex items-center gap-4 p-3 hover:bg-gray-200 cursor-pointer'>
                                     <Avatar >
@@ -66,7 +65,7 @@ const ChatPage = () => {
                                         <span className='font-semibold'>
                                             {suggestedUser?.username}
                                         </span>
-                                        <span className={`text-xs ${isOnline ? 'text-green-500':'text-red-600'}`}>{isOnline ? 'Online':'Offline'}</span>
+                                        <span className={`text-xs ${isOnline ? 'text-green-500' : 'text-red-600'}`}>{isOnline ? 'Online' : 'Offline'}</span>
 
                                     </div>
                                 </div>

@@ -18,6 +18,7 @@ import storage from 'redux-persist/lib/storage'
 import rtnSlice from "./rtnSlice.js";
 import storySlice from "./storySlice.js";
 import { apiSlice } from "@/services/api.js";
+import menuSlice from "./menuSlice.js";
 
 
 const persistConfig = {
@@ -33,6 +34,7 @@ const rootReducer = combineReducers({
     chat: chatSlice,
     realTimeNotification: rtnSlice,
     story: storySlice,
+    menu:menuSlice,
     [apiSlice.reducerPath]:apiSlice.reducer
 })
 

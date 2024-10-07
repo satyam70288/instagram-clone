@@ -8,21 +8,26 @@ import { useDispatch, useSelector } from 'react-redux';
 import CreatePost from './CreatePost';
 import { Popover, PopoverContent } from './ui/popover';
 import { PopoverTrigger } from '@radix-ui/react-popover';
-
+import { Menu } from 'lucide-react';
 import { Button } from './ui/button';
 import { setAuthUser } from '@/redux/authSlice';
 import { setPosts, setSelectedPost } from '@/redux/postSlice';
 import SearchPage from './SearchPage';
-
+import { setMenuHadlar } from '@/redux/menuSlice';
 const LeftSidebar = () => {
     const navigate = useNavigate();
     const [open, setOpen] = useState(false);
+    const [menu, setMenu] = useState(false)
     const [searchActive, setSearchActive] = useState(false); // New state for SearchPage
     const { user } = useSelector(state => state.auth);
     const dispatch = useDispatch();
     const { likeNotification } = useSelector(state => state.realTimeNotification);
-
-    const logOutHandler = async () => {
+    
+    const menuHandler = () => {
+        setMenu((prevMenu) => !prevMenu);
+        dispatch(setMenuHadlar(!menu));
+      };
+        const logOutHandler = async () => {
         try {
             const res = await axios.get('/api/v1/user/logout', { withCredentials: true });
             if (res.data.success) {
@@ -53,12 +58,13 @@ const LeftSidebar = () => {
             navigate("/reels");
         } else if (textType === 'Explore') {
             navigate("/explore");
-        } 
+        }
         else if (textType === 'Search') {
             setSearchActive(true); // Activate the search page when "Search" is clicked
         }
         else if (textType === 'Notifications') {
-            navigate("/notifications");}
+            navigate("/notifications");
+        }
     };
 
     const sidebarItems = [
@@ -82,7 +88,8 @@ const LeftSidebar = () => {
     ];
 
     return (
-        <div className="hidden md:w-[17%] lg:block md:fixed top-0 z-10 left-0 px-4 w-[16%] h-screen border-r border-gray-300 bg-[#1C1C1C] text-white">
+        <div className={`hidden sm:block transition-all duration-500 ${menu ? 'w-[6%]' : 'w-[16%]'} lg:block md:fixed top-0 z-10 left-0 px-4 h-screen border-r border-gray-300 bg-[#1C1C1C] text-white`}>
+            <Menu className="w-10 h-10 ml-auto" onClick={menuHandler} />
             <div className='flex flex-col '>
                 <h1 className='my-8 font-bold text-xl'>LOGO</h1>
                 <div className=''>
@@ -90,7 +97,7 @@ const LeftSidebar = () => {
                         sidebarItems.map((item, index) => (
                             <div onClick={() => sidebarHandler(item.text)} key={index} className='flex items-center gap-4 relative hover:bg-red-400 cursor-pointer rounded-lg p-3 my-3' >
                                 {item.icon}
-                                <span>{item.text}</span>
+                                <span className={`${menu ? 'hidden' : 'block'}`}>{item.text}</span>
                                 {
                                     item.text === 'Notifications' && likeNotification?.length > 0 && (
                                         <Popover>

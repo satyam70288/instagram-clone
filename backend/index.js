@@ -9,7 +9,7 @@ import { Server } from "socket.io";
 import connectDB from "./utils/db.js";
 import userRoute from "./routes/user.route.js";
 import postRoute from "./routes/post.route.js";
-import storyRoute from './routes/story.route.js'
+import storyRoute from './routes/story.route.js';
 import notificationRoute from "./routes/notification.routes.js";
 import messageRoute from "./routes/message.route.js";
 import { initializeSocketIO } from "./socket/socket.js";
@@ -20,10 +20,13 @@ const PORT = process.env.PORT || 3000;
 const __dirname = path.resolve();
 const app = express();
 const server = createServer(app);
+
+// Socket.IO configuration
 const io = new Server(server, {
     cors: {
-        origin: process.env.URL,
-        methods: ['GET', 'POST'],
+        origin: process.env.URL || "http://localhost:5173", // Ensure this is set to your frontend's URL
+        methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], // Include PATCH method
+        credentials: true, // Allow credentials to be sent with Socket.IO
     },
 });
 
@@ -33,45 +36,53 @@ initializeSocketIO(io);
 // Middleware setup
 app.use(express.json());
 app.use(cookieParser());
-// app.use(urlencoded({ extended: true }));
 
+// CORS configuration
 const corsOptions = {
-    // origin: process.env.URL, // Use an array to specify multiple origins
-    origin : '*',
-    credentials: true,
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    allowedHeaders: 'Content-Type,Authorization',
+    origin: process.env.URL || "http://localhost:5173", // Specify frontend URL or allow all origins
+    credentials: true, // Enable credentials support
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], // Include PATCH method here
+    allowedHeaders: ['Content-Type', 'Authorization'], // Allow necessary headers
     exposedHeaders: ['Authorization'], // Optionally expose headers to the client
 };
 
-
+// Apply CORS Middleware
 app.use(cors(corsOptions));
+
+// Handle preflight requests
+app.options('*', cors(corsOptions));
+
+// Logging middleware (for debugging)
+app.use((req, res, next) => {
+    console.log('Incoming request:', req.method, req.url);
+    console.log('Headers:', req.headers);
+    next();
+});
 
 // API Routes
 app.use("/api/v1/user", userRoute);
 app.use("/api/v1/post", postRoute);
 app.use("/api/v1/message", messageRoute);
-app.use("/api/v1/story",storyRoute );
-app.use("/api/v1/notification",notificationRoute);
+app.use("/api/v1/story", storyRoute);
+app.use("/api/v1/notification", notificationRoute);
 
-// Static Files
+// Serve static files from the 'public' directory
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
-// Serve frontend if needed
-// app.use(express.static(path.join(__dirname, "frontend", "dist")));
-// app.get("*", (req, res) => {
-//     res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
-// });
-
-// Error Handling Middleware
+// Error Handling Middleware with CORS headers
 app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).send('Something broke!');
+    res.header('Access-Control-Allow-Origin', process.env.URL || "http://localhost:3000");
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    console.error('Error:', err.stack);
+    res.status(err.status || 500).json({ message: err.message });
 });
-export { io };
 
-// Start server
+// Start server and connect to database
 server.listen(PORT, () => {
-    connectDB();
+    connectDB(); // Ensure your MongoDB connection is established
     console.log(`Server listening on port ${PORT}`);
 });
+
+export { io };

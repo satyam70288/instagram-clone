@@ -4,15 +4,20 @@ import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom'; // Import Link from react-router-dom
 
 const Explore = () => {
-  const { data } = useExplorePostQuery();
+  const { data, refetch } = useExplorePostQuery(undefined, {
+    refetchOnMountOrArgChange: true, // Refetch on component mount
+    refetchOnWindowFocus: true, // Refetch when window regains focus
+  });
+  const { menu } = useSelector(store => store.menu)
+
   const isVideo = (url) => {
     // Check if URL ends with common video file extensions
     return url.endsWith('.mp4') || url.endsWith('.mov') || url.endsWith('.avi');
   };
 
   return (
-    <div className="ml-[16%] w-[calc(100%-16%)] h-screen overflow-y-auto bg-gray-900 p-2">
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 p-4">
+    <div className={`${menu ? 'ml-[5%] w-[calc(100%-5%)]' : 'ml-[16%] w-[calc(100%-16%)]'} transition-all duration-500 h-screen overflow-y-auto bg-gray-900 p-2`}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-4 p-4">
         {data?.posts.map((item) => (
           <Link
             key={item._id}
