@@ -1,15 +1,17 @@
 /** @type {import('tailwindcss').Config} */
+const plugin = require('tailwindcss/plugin');
+
 module.exports = {
-  darkMode: ["class"],
+  darkMode: ["class"], // Enable dark mode with class strategy
   content: [
-    './pages/**/*.{js,jsx}',
-    './components/**/*.{js,jsx}',
-    './app/**/*.{js,jsx}',
+    './pages/**/*.{js,jsx}', 
+    './components/**/*.{js,jsx}', 
+    './app/**/*.{js,jsx}', 
     './src/**/*.{js,jsx}',
   ],
-  prefix: "",
+  prefix: "", // Optional, keep empty if no prefix is needed
   theme: {
-    container: { 
+    container: {
       center: true,
       padding: "2rem",
       screens: {
@@ -48,5 +50,16 @@ module.exports = {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
-}
+  plugins: [
+    require("tailwindcss-animate"),
+    plugin(function ({ addUtilities }) {
+      addUtilities({
+        '.gradient-border': {
+          border: '5px solid',
+          borderImageSlice: 1,
+          borderImageSource: 'linear-gradient(to right, #F58529, #DD2A7B, #8134AF)',
+        },
+      });
+    }),
+  ],
+};
