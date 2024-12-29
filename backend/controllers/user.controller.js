@@ -190,6 +190,7 @@ export const login = async (req, res) => {
 };
 
 export const logout = async (_, res) => {
+    console.log('logout');
     try {
         return res.cookie("token", "", { maxAge: 0 }).json({
             message: 'Logged out successfully.',

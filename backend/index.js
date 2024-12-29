@@ -39,7 +39,7 @@ app.use(cookieParser());
 
 // CORS configuration
 const corsOptions = {
-    origin: process.env.URL || "http://localhost:5173", // Specify frontend URL or allow all origins
+    origin:  '*', // Specify frontend URL or allow all origins
     credentials: true, // Enable credentials support
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], // Include PATCH method here
     allowedHeaders: ['Content-Type', 'Authorization'], // Allow necessary headers
@@ -51,6 +51,7 @@ app.use(cors(corsOptions));
 
 // Handle preflight requests
 app.options('*', cors(corsOptions));
+app.use('/public', express.static(path.join(__dirname, 'public')));
 
 // Logging middleware (for debugging)
 app.use((req, res, next) => {
@@ -67,8 +68,10 @@ app.use("/api/v1/story", storyRoute);
 app.use("/api/v1/notification", notificationRoute);
 
 // Serve static files from the 'public' directory
-app.use('/public', express.static(path.join(__dirname, 'public')));
-
+app.use(express.static(path.join(__dirname, "/frontend/dist")));
+app.get("*", (req,res)=>{
+    res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
+})
 // Error Handling Middleware with CORS headers
 app.use((err, req, res, next) => {
     res.header('Access-Control-Allow-Origin', process.env.URL || "http://localhost:3000");

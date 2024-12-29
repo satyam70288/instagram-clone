@@ -14,6 +14,9 @@ const Explore = () => {
     // Check if URL ends with common video file extensions
     return url.endsWith('.mp4') || url.endsWith('.mov') || url.endsWith('.avi');
   };
+  const isPdf = (fileName) => {
+    return fileName?.toLowerCase().endsWith('.pdf');
+};
 
   return (
     <div className={`${menu ? 'ml-[5%] w-[calc(100%-5%)]' : 'ml-[16%] w-[calc(100%-16%)]'} transition-all duration-500 h-screen overflow-y-auto bg-gray-900 p-2`}>
@@ -26,18 +29,28 @@ const Explore = () => {
           >
             {isVideo(item?.image) ? (
               <video
-                className="w-full h-80 object-cover rounded-t-lg"
+                className='rounded-md my-2 w-full aspect-square object-cover'
                 controls
                 src={`http://localhost:8000/${item?.image.replace(/\\/g, '/')}`}
-                alt="post_video"
+                alt="item_video"
+              />
+            ) : isPdf(item?.image) ? ( // Check if the file is a PDF
+              <embed
+                className='rounded-md my-2 w-full aspect-square'
+                src={`http://localhost:8000/${item?.image.replace(/\\/g, '/')}`}
+                type="application/pdf"
+                width="100%"
+                height="350px" // Adjust the height as needed
+                alt="item_pdf"
               />
             ) : (
               <img
-                className="w-full h-80 object-cover rounded-t-lg"
+                className='rounded-md my-2 w-full aspect-square object-cover'
                 src={`http://localhost:8000/${item?.image.replace(/\\/g, '/')}`}
                 alt="post_image"
               />
             )}
+
             <div className="absolute inset-0 bg-pink-50 bg-opacity-30 opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
               <p className="text-white text-lg font-semibold p-2">{item.content}</p>
             </div>
