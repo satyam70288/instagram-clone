@@ -1,7 +1,7 @@
 /** @type {import('tailwindcss').Config} */
-const plugin = require('tailwindcss/plugin');
+import plugin from 'tailwindcss/plugin';
 
-module.exports = {
+export default {
   darkMode: ["class"], // Enable dark mode with class strategy
   content: [
     './pages/**/*.{js,jsx}', 
@@ -51,7 +51,6 @@ module.exports = {
     },
   },
   plugins: [
-    require("tailwindcss-animate"),
     plugin(function ({ addUtilities }) {
       addUtilities({
         '.gradient-border': {
@@ -61,5 +60,6 @@ module.exports = {
         },
       });
     }),
+    import('tailwindcss-animate').then((animate) => animate.default || animate),
   ],
 };
