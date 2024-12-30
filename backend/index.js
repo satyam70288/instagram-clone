@@ -22,8 +22,6 @@ const __dirname = path.resolve();
 const app = express();
 const server = createServer(app);
 
-// 📂 Serve Public Folder
-app.use('/public', express.static(path.join(__dirname, 'public')));
 
 // 📡 Socket.IO Configuration
 const io = new Server(server, {
@@ -43,7 +41,7 @@ app.use(cookieParser());
 
 // 🌐 CORS Configuration
 const corsOptions = {
-    origin: process.env.URL || "http://localhost:5173",
+    origin: "*",
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
@@ -67,13 +65,16 @@ app.use("/api/v1/message", messageRoute);
 app.use("/api/v1/story", storyRoute);
 app.use("/api/v1/notification", notificationRoute);
 //📂 Serve Public Folder
-app.use('/public', express.static(path.join(__dirname, 'public')));
 
 // ⚙️ Serve Frontend (Static Files)
-// app.use(express.static(path.join(__dirname, "/frontend/dist")));
-app.get("*", (req, res) => {
-    res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
-});
+// Serve the public folder
+// Serve Frontend Build (dist)
+app.use(express.static(path.join(__dirname, '/frontend/dist')));
+
+// Serve Public Folder (images, etc.)
+app.use('/public', express.static(path.join(__dirname, 'public')));
+
+
 
 // ⚠️ Global Error Handling Middleware
 app.use((err, req, res, next) => {
