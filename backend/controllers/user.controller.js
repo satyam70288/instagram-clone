@@ -174,7 +174,11 @@ export const login = async (req, res) => {
         // Set the token as a cookie and also send it in the response headers
         return res
             .header('Authorization', `Bearer ${token}`)
-            .cookie('token', token, { httpOnly: true, sameSite: 'strict', maxAge: 24 * 60 * 60 * 1000 })
+            .cookie('token', token, {   httpOnly: true,
+                sameSite: 'None',  // Ensures cookies can be sent in cross-origin requests
+                secure: true,  // Ensures the cookie is only sent over HTTPS (required for sameSite: 'None')
+                maxAge: 24 * 60 * 60 * 1000,
+               })
             .json({
                 message: `Welcome back ${user.username}`,
                 success: true,
