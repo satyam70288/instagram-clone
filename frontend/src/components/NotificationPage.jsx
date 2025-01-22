@@ -3,8 +3,11 @@ import useGetAllNotification from '@/hooks/useGetAllNotification';
 import { useMarkAsReadMutation } from '@/services/api';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 const NotificationPage = () => {
+  const { menu } = useSelector(store => store.menu)
+
   const { notifications, loading, error } = useGetAllNotification();
   const [markAsRead] = useMarkAsReadMutation();
 const navigate=useNavigate()
@@ -37,7 +40,14 @@ const navigate=useNavigate()
   if (error) return <div>Error loading notifications.</div>;
 
   return (
-    <div className='p-5 ml-[16%] w-[calc(100%-16%)] bg-black text-white h-full flex items-center justify-center'>
+    <div className={`p-5 ml-0 w-full 
+  ${menu ? 
+      ' lg:ml-[6%] lg:w-[calc(100%-6%)]' 
+      : 
+      ' lg:ml-[16%] lg:w-[calc(100%-16%)]'
+  } 
+  bg-black text-white h-full flex items-center justify-center`}>
+ 
       <div className='flex flex-col h-[80vh] w-[40%] bg-gray-900 items-center rounded-lg shadow-lg p-5 overflow-y-auto'>
         <div className='text-xl font-semibold text-center mb-4 border-b border-gray-700 pb-2'>
           Notifications

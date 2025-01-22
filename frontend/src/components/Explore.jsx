@@ -1,3 +1,4 @@
+import { server } from '@/constant/config';
 import { useExplorePostQuery } from '@/services/api';
 import React from 'react';
 import { useSelector } from 'react-redux';
@@ -16,10 +17,19 @@ const Explore = () => {
   };
   const isPdf = (fileName) => {
     return fileName?.toLowerCase().endsWith('.pdf');
-};
+  };
 
   return (
-    <div className={`${menu ? 'ml-[5%] w-[calc(100%-5%)]' : 'ml-[16%] w-[calc(100%-16%)]'} transition-all duration-500 h-screen overflow-y-auto bg-gray-900 p-2`}>
+    <div
+      className={`
+    transition-all duration-500 h-screen overflow-y-auto bg-gray-900 p-2
+    ${menu ?
+          'ml-[5%] w-[calc(100%-5%)] sm:ml-[8%] sm:w-[calc(100%-8%)] md:ml-[15%] md:w-[calc(100%-15%)] lg:ml-[6%] lg:w-[calc(100%-6%)]'
+          :
+          'ml-[16%] w-[calc(100%-16%)] sm:ml-[14%] sm:w-[calc(100%-14%)] md:ml-[25%] md:w-[calc(100%-25%)] lg:ml-[16%] lg:w-[calc(100%-16%)]'
+        }
+  `}
+    >
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-4 p-4">
         {data?.posts.map((item) => (
           <Link
@@ -31,13 +41,13 @@ const Explore = () => {
               <video
                 className='rounded-md my-2 w-full aspect-square object-cover'
                 controls
-                src={`http://localhost:8000/${item?.image.replace(/\\/g, '/')}`}
+                src={`${server}/${item?.image.replace(/\\/g, '/')}`}
                 alt="item_video"
               />
             ) : isPdf(item?.image) ? ( // Check if the file is a PDF
               <embed
                 className='rounded-md my-2 w-full aspect-square'
-                src={`http://localhost:8000/${item?.image.replace(/\\/g, '/')}`}
+                src={`${server}/${item?.image.replace(/\\/g, '/')}`}
                 type="application/pdf"
                 width="100%"
                 height="350px" // Adjust the height as needed
@@ -46,7 +56,7 @@ const Explore = () => {
             ) : (
               <img
                 className='rounded-md my-2 w-full aspect-square object-cover'
-                src={`http://localhost:8000/${item?.image.replace(/\\/g, '/')}`}
+                src={`${server}/${item?.image.replace(/\\/g, '/')}`}
                 alt="post_image"
               />
             )}

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Dialog } from '@radix-ui/react-dialog';
 import { DialogContent, DialogHeader } from './ui/dialog';
+import { server } from '@/constant/config';
 
 const ViewStory = ({ open, setOpen, story }) => {
   if (!story) return null;
@@ -14,7 +15,7 @@ const ViewStory = ({ open, setOpen, story }) => {
         <DialogHeader className="text-center font-semibold">View Story</DialogHeader>
         <div className="flex flex-col items-center">
           <img
-            src={`http://localhost:8000/${story?.media}`}
+            src={`${server}/${story?.media}`}
             alt="Story"
             className='w-full h-full object-cover rounded-md'
           />

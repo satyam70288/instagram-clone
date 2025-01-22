@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import { setPosts } from '@/redux/postSlice';
 import { Dialog, DialogClose, DialogContent } from '@radix-ui/react-dialog';
 import { DialogHeader } from './ui/dialog';
+import { server } from '@/constant/config';
 
 const ExploreDetails = () => {
     const params = useParams();
@@ -74,13 +75,13 @@ const ExploreDetails = () => {
                                 <video
                                     className='rounded-md my-2 w-full h-full object-cover'
                                     controls
-                                    src={`http://localhost:8000/${foundPost?.image.replace(/\\/g, '/')}`}
+                                    src={`${server}/${foundPost?.image.replace(/\\/g, '/')}`}
                                     alt="foundPost_video"
                                 />
                             ) : isPdf(foundPost?.image) ? (
                                 <embed
                                     className='rounded-md my-2 w-full'
-                                    src={`http://localhost:8000/${foundPost?.image.replace(/\\/g, '/')}`}
+                                    src={`${server}/${foundPost?.image.replace(/\\/g, '/')}`}
                                     type="application/pdf"
                                     width="100%"
                                     height="100%"
@@ -89,7 +90,7 @@ const ExploreDetails = () => {
                             ) : (
                                 <img
                                     className='rounded-md my-2 w-full h-full object-cover'
-                                    src={`http://localhost:8000/${foundPost?.image.replace(/\\/g, '/')}`}
+                                    src={`${server}/${foundPost?.image.replace(/\\/g, '/')}`}
                                     alt="foundPost_image"
                                 />
                             )}
@@ -99,7 +100,7 @@ const ExploreDetails = () => {
                                 <div className='w-12 h-12'>
                                     <Avatar>
                                         <AvatarImage
-                                            src={`http://localhost:8000/${foundPost?.author?.profilePicture}`}
+                                            src={`${server}/${foundPost?.author?.profilePicture}`}
                                             className='w-full h-full object-cover rounded-full'
                                         />
                                         <AvatarImage>CN</AvatarImage>
@@ -121,7 +122,7 @@ const ExploreDetails = () => {
                                         <div className='w-12 h-12'>
                                             <Avatar>
                                                 <AvatarImage
-                                                    src={`http://localhost:8000/${item?.author?.profilePicture}`}
+                                                    src={`${server}/${item?.author?.profilePicture}`}
                                                     className='w-full h-full object-cover rounded-full'
                                                 />
                                                 <AvatarImage>CN</AvatarImage>

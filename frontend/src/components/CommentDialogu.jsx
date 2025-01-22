@@ -9,6 +9,7 @@ import Comment from './Comment'
 import axios from 'axios'
 import { toast } from 'sonner'
 import { setPosts } from '@/redux/postSlice'
+import { server } from '@/constant/config'
 
 const CommentDialog = ({ open, setOpen }) => {
   const [text, setText] = useState("");
@@ -36,7 +37,8 @@ const CommentDialog = ({ open, setOpen }) => {
     try {
       const res = await axios.post(`/api/v1/post/${selectedPost?._id}/comment`, { text }, {
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
         withCredentials: true
       });
@@ -63,7 +65,7 @@ const CommentDialog = ({ open, setOpen }) => {
         <div className='flex flex-1'>
           <div className='w-1/2'>
             <img
-                src={`http://localhost:8000/${selectedPost?.image.replace(/\\/g, '/')}`}
+                src={`${server}/${selectedPost?.image.replace(/\\/g, '/')}`}
                 alt="post_img"
               className='w-full h-full object-cover rounded-l-lg'
             />

@@ -60,6 +60,7 @@ const CreateStory = ({ open, setOpen, user }) => {
             const res = await axios.post('/api/v1/story/create', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
+                    // 'Authorization': `Bearer ${token}`
                 },
                 withCredentials: true,
             });

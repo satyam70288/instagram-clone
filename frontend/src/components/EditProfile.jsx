@@ -9,6 +9,7 @@ import axios from 'axios'
 import { toast } from 'sonner'
 import { Loader2 } from 'lucide-react'
 import { setAuthUser } from '@/redux/authSlice'
+import { server } from '@/constant/config'
 
 const EditProfile = () => {
     const { user } = useSelector((state) => state.auth)
@@ -43,7 +44,8 @@ const EditProfile = () => {
             setLoading(true);
             const res = await axios.post('/api/v1/user/profile/edit', formData, {
                 headers: {
-                    'Content-Type': 'multipart/form-data'
+                    'Content-Type': 'multipart/form-data',
+                    // 'Authorization': `Bearer ${token}`
                 },
                 withCredentials: true
             });
@@ -80,7 +82,7 @@ const EditProfile = () => {
                     <div className='flex gap-3 items-center'>
                         <Avatar className='w-16 h-16 rounded-full overflow-hidden'>
                             <AvatarImage
-                                src={`http://localhost:8000/${user?.profilePicture.replace(/\/{2,}/g, '/')}`}
+                                src={`${server}/${user?.profilePicture.replace(/\/{2,}/g, '/')}`}
                                 alt="profile photo"
                                 className='object-cover w-full h-full' // Ensures image covers the container
                             />

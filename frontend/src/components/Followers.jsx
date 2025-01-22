@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import { Button } from './ui/button'
 import { useGetFollowingOrFollowerQuery } from '@/services/api'
+import { server } from '@/constant/config'
 
 const Followers = () => {
     const [follower, setFollower] = useState([])
@@ -13,7 +14,7 @@ const Followers = () => {
 
     // const getFollowingFollowers = async () => {
     //     try {
-    //         const res = await axios.get(`http://localhost:8000/api/v1/user/getFollowingOrFollower/${userId}`, { withCredentials: true });
+    //         const res = await axios.get(`${server}/api/v1/user/getFollowingOrFollower/${userId}`, { withCredentials: true });
     //         if (res.data.success) {
     //             toast.success(res.data.message);
     //             setFollower(res.data.followers)
@@ -46,7 +47,7 @@ const Followers = () => {
                     {follower.map((item, key) => (
                             <div key={key} className="flex items-center justify-between p-2 hover:bg-gray-700 rounded-lg">
                                 <div className="flex items-center gap-3">
-                                    <img src={`http://localhost:8000/${item.profilePicture}`}  alt={item.username} className="h-10 w-10 rounded-full" />
+                                    <img src={`${server}/${item.profilePicture}`}  alt={item.username} className="h-10 w-10 rounded-full" />
                                     <span className="text-white">{item.username}</span>
                                 </div>
                                 <Button className="text-red-500">Remove</Button>

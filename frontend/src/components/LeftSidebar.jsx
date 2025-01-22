@@ -22,12 +22,12 @@ const LeftSidebar = () => {
     const { user } = useSelector(state => state.auth);
     const dispatch = useDispatch();
     const { likeNotification } = useSelector(state => state.realTimeNotification);
-    
+
     const menuHandler = () => {
         setMenu((prevMenu) => !prevMenu);
         dispatch(setMenuHadlar(!menu));
-      };
-        const logOutHandler = async () => {
+    };
+    const logOutHandler = async () => {
         try {
             const res = await axios.get('/api/v1/user/logout', { withCredentials: true });
             console.log(res);
@@ -89,15 +89,15 @@ const LeftSidebar = () => {
     ];
 
     return (
-        <div className={`hidden sm:block transition-all duration-500 ${menu ? 'w-[6%]' : 'w-[16%]'} lg:block md:fixed top-0 z-10 left-0 px-4 h-screen border-r border-gray-300 bg-[#1C1C1C] text-white`}>
+        <div className={`hidden lg:block transition-all duration-500  ${menu ? 'sm:w-[9%] md:w-[10%] lg:w-[6%]' : 'sm:w-[16%] md:w-[25%] lg:w-[16%]'}  md:fixed top-0 z-10 left-0 px-4 h-screen border-r border-gray-300 bg-[#1C1C1C] text-white`}>
             <Menu className="w-10 h-10 ml-auto" onClick={menuHandler} />
             <div className='flex flex-col '>
-                <h1 className='my-8 font-bold text-xl'>LOGO</h1>
+                <h1 className='md:hidden my-8 font-bold text-xl'>LOGO</h1>
                 <div className=''>
                     {
                         sidebarItems.map((item, index) => (
                             <div onClick={() => sidebarHandler(item.text)} key={index} className='flex items-center gap-4 relative hover:bg-red-400 cursor-pointer rounded-lg p-3 my-3' >
-                                {item.icon}
+                                <span className={`${menu ? 'text-2xl' : 'block text-xl'}`}>{item.icon}</span>
                                 <span className={`${menu ? 'hidden' : 'block'}`}>{item.text}</span>
                                 {
                                     item.text === 'Notifications' && likeNotification?.length > 0 && (

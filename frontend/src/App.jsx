@@ -19,6 +19,7 @@ import Followers from './components/Followers'
 import Following from './components/Following'
 import ExploreDetails from './components/ExploreDetails'
 import NotificationPage from './components/NotificationPage'
+import { server } from './constant/config'
 const browserRouter = createBrowserRouter([
   {
     path: "/",
@@ -85,7 +86,7 @@ const App = () => {
 
   useEffect(() => {
     if (user) {
-      const socketio = io('http://localhost:8000', {
+      const socketio = io(`${server}`, {
         query: {
           userId: user?._id
         },

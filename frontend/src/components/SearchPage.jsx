@@ -3,6 +3,7 @@ import { CircleX } from 'lucide-react';
 import { X } from 'lucide-react';
 import { useSearchUserQuery } from '@/services/api';
 import { Link } from 'react-router-dom';
+import { server } from '@/constant/config';
 
 const SearchPage = ({ searchActive, setSearchActive }) => {
     const modelRef = useRef();
@@ -74,7 +75,7 @@ const SearchPage = ({ searchActive, setSearchActive }) => {
                         <Link to={`/profile/${user._id}`} key={user._id}>
                             <div className='flex items-center gap-4 justify-between'>
                                 <div className='w-12 h-12 overflow-hidden rounded-full'>
-                                    <img src={`http://localhost:8000/${user.profilePicture}`} alt="" />
+                                    <img src={`${server}/${user.profilePicture}`} alt="" />
                                 </div>
                                 <p>{user.username}</p>
                                 <p><X /></p>

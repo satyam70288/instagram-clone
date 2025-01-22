@@ -19,7 +19,8 @@ const ChatPage = () => {
         try {
             const res = await axios.post(`/api/v1/message/send/${receiverId}`, { textMessage }, {
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    // 'Authorization': `Bearer ${token}`
                 },
                 withCredentials: true
             });

@@ -10,6 +10,7 @@ import { AtSign, Heart, MessageCircle } from 'lucide-react';
 import { setSuggestedUsers, setUserProfile } from '@/redux/authSlice';
 import { toast } from 'sonner';
 import axios from 'axios';
+import { server } from '@/constant/config';
 
 const Profile = () => {
   const params = useParams();
@@ -70,7 +71,7 @@ const Profile = () => {
           <section className='flex items-center justify-center'>
             <Avatar className='h-32 w-32'>
               <AvatarImage
-                src={`http://localhost:8000/${userProfile?.profilePicture.replace(/\/{2,}/g, '/')}`}
+                src={`${server}/${userProfile?.profilePicture.replace(/\/{2,}/g, '/')}`}
                 alt="profile photo"
               />
               <AvatarFallback>CN</AvatarFallback>
@@ -134,13 +135,13 @@ const Profile = () => {
                       <video
                         className='rounded-md my-2 w-full aspect-square object-cover'
                         controls
-                        src={`http://localhost:8000/${post?.image.replace(/\\/g, '/')}`}
+                        src={`${server}/${post?.image.replace(/\\/g, '/')}`}
                         alt="post_video"
                       />
                     ) : (
                       <img
                         className='rounded-md my-2 w-full aspect-square object-cover'
-                        src={`http://localhost:8000/${post?.image.replace(/\\/g, '/')}`}
+                        src={`${server}/${post?.image.replace(/\\/g, '/')}`}
                         alt="post_image"
                       />
                     )}

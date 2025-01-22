@@ -7,8 +7,8 @@ import SuggestedUsers from './SuggestedUsers';
 const RightSidebar = () => {
   const { user } = useSelector(store => store.auth);
   return (
-    <div className='w-[25%]  py-10 pr-10 pl-8 bg-[#1C1C1C]'>
-      <div className='flex items-center gap-2  bg-[#E6E6FA] p-6 rounded-md'>
+<div className='md:hidden lg:block w-[25%] py-10 pr-10 pl-8 bg-[#1C1C1C] hidden max-w-[430px]:hidden'>
+<div className='flex items-center gap-2  bg-[#E6E6FA] p-6 rounded-md'>
         <Link to={`/profile/${user?._id}`}>
           <Avatar>
             <AvatarImage src={user?.profilePicture} alt="post_image" />

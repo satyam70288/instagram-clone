@@ -1,10 +1,11 @@
 // src/services/api.js
+import { server } from '@/constant/config';
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 export const apiSlice = createApi({
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({ 
-    baseUrl: 'http://localhost:8000/api/v1',
+    baseUrl: `${server}/api/v1`,
     credentials: 'include',  // Ensure credentials are included for cross-origin requests if required
   }),
   tagTypes: ['User', 'Posts', 'Notification'],  // Define tagTypes used in the API

@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { setPosts, setSelectedPost } from '@/redux/postSlice';
 import { Badge } from './ui/badge';
 import CommentDialogu from './CommentDialogu';
+import { server } from '@/constant/config';
 
 const PostData = ({ post }) => {
     const [text, setText] = useState("");
@@ -29,7 +30,7 @@ const PostData = ({ post }) => {
     const isPdf = (fileName) => {
         return fileName?.toLowerCase().endsWith('.pdf');
     };
-    
+
     const changeEventHandler = (e) => {
         const inputText = e.target.value;
         setText(inputText.trim() || "");
@@ -82,9 +83,17 @@ const PostData = ({ post }) => {
     };
 
     const deletePostHandler = async () => {
+        const token = localStorage.getItem("authToken");
+        console.log(token);
+    
         try {
-            const res = await axios.delete(`/api/v1/post/delete/${post?._id}`, { withCredentials: true });
-
+            const res = await axios.delete(`/api/v1/post/delete/${post?._id}`, {
+                withCredentials: true,
+                headers: {
+                    // Authorization: `Bearer ${token}`, // Include the token in the Authorization header
+                },
+            });
+    
             if (res.data.success) {
                 const updatedPostData = posts.filter(postItem => postItem._id !== post?._id);
                 dispatch(setPosts(updatedPostData));
@@ -95,10 +104,17 @@ const PostData = ({ post }) => {
             toast.error(error.response?.data?.message || 'An unexpected error occurred.');
         }
     };
-
+    
     const bookmarkHandler = async () => {
         try {
-            const res = await axios.get(`/api/v1/post/${post?._id}/bookmark`, { withCredentials: true });
+            const res = await axios.get(`/api/v1/post/${post?._id}/bookmark`, {
+                withCredentials: true,
+                headers: {
+                    Authorization: `Bearer ${token}`, // Include the token in the Authorization header
+                },
+            }
+            )
+                ;
             if (res.data.success) {
                 toast.success(res.data.message);
             }
@@ -109,7 +125,12 @@ const PostData = ({ post }) => {
 
     const followOrUnfollowHandler = async (id) => {
         try {
-            const res = await axios.post(`/api/v1/user/followorunfollow/${id}`, {}, { withCredentials: true });
+            const res = await axios.post(`/api/v1/user/followorunfollow/${id}`, {}, {
+                withCredentials: true,
+                headers: {
+                    // Authorization: `Bearer ${token}`, // Include the token in the Authorization header
+                }
+            },);
 
             if (res.data.success) {
                 const isCurrentlyFollowing = post?.author?.followers.includes(user?._id);
@@ -134,11 +155,11 @@ const PostData = ({ post }) => {
     };
 
     return (
-        <div className='ml-[14%] my-8 w-full max-w-xs sm:max-w-sm md:max-w-md mx-auto border p-4 border-gray-300 bg-white rounded-lg shadow-lg'>
+        <div className=' my-8 w-full max-w-xs sm:max-w-sm md:max-w-md mx-auto border p-4 border-gray-300 bg-white rounded-lg shadow-lg'>
             <div className='flex items-center justify-between'>
                 <div className='flex items-center gap-2'>
                     <Avatar>
-                        <AvatarImage src={`http://localhost:8000/${post?.author?.profilePicture.replace(/\\/g, '/')}`} alt="post_image" />
+                        <AvatarImage src={`${server}/${post?.author?.profilePicture.replace(/\\/g, '/')}`} alt="post_image" />
                         <AvatarFallback>CN</AvatarFallback>
                     </Avatar>
                     <div className='flex items-center gap-3'>
@@ -165,20 +186,20 @@ const PostData = ({ post }) => {
             </div>
             {/* <img
                 className='rounded-md my-2 w-full aspect-square object-cover'
-                src={`http://localhost:8000/${post?.image.replace(/\\/g, '/')}`}
+                src={`${server}/${post?.image.replace(/\\/g, '/')}`}
                 alt="post_img"
             /> */}
             {isVideo(post?.image) ? (
                 <video
                     className='rounded-md my-2 w-full aspect-square object-cover'
                     controls
-                    src={`http://localhost:8000/${post?.image.replace(/\\/g, '/')}`}
+                    src={`${server}/${post?.image.replace(/\\/g, '/')}`}
                     alt="post_video"
                 />
             ) : isPdf(post?.image) ? ( // Check if the file is a PDF
                 <embed
                     className='rounded-md my-2 w-full aspect-square'
-                    src={`http://localhost:8000/${post?.image.replace(/\\/g, '/')}`}
+                    src={`${server}/${post?.image.replace(/\\/g, '/')}`}
                     type="application/pdf"
                     width="100%"
                     height="400px" // Adjust the height as needed
@@ -187,9 +208,10 @@ const PostData = ({ post }) => {
             ) : (
                 <img
                     className='rounded-md my-2 w-full aspect-square object-cover'
-                    src={`http://localhost:8000/${post?.image.replace(/\\/g, '/')}`}
+                    src={`${server}/${post?.image.replace(/\\/g, '/')}`}
                     alt="post_image"
                 />
+
             )}
 
             <div className='flex items-center justify-between my-2'>

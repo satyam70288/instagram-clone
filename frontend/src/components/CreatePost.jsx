@@ -86,32 +86,36 @@ const CreatePost = ({ open, setOpen }) => {
 
 
   const createPostHandler = async (e) => {
-    console.log(Cookies.get('token'));
+    const token = Cookies.get('token'); // Get token from cookies
+    console.log('Token:', token);
+
     const formData = new FormData();
     formData.append("caption", caption);
-    console.log(caption)
     if (imagePreview) formData.append("image", file);
-    console.log(formData)
+
     try {
-      setLoading(true);
-      const res = await axios.post('/api/v1/post/addpost', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        },
-        withCredentials: true
-      });
-      console.log(res)
-      if (res.data.success) {
-        dispatch(setPosts([res.data.post, ...posts]));// [1] -> [1,2] -> total element = 2
-        toast.success(res.data.message);
-        setOpen(false);
-      }
+        setLoading(true);
+        const res = await axios.post('/api/v1/post/addpost', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                'Authorization': `Bearer ${token}` // Pass token explicitly in headers
+            }
+        });
+        console.log('Response:', res);
+
+        if (res.data.success) {
+            dispatch(setPosts([res.data.post, ...posts]));
+            toast.success(res.data.message);
+            setOpen(false);
+        }
     } catch (error) {
-      toast.error(error.response.data.message);
+        console.error('Error:', error.response?.data?.message || error.message);
+        toast.error(error.response?.data?.message || 'Failed to create post');
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
-  }
+};
+
 
   return (
     <div>

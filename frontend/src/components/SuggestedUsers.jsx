@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import axios from 'axios';
 import useGetSuggestedUsers from '@/hooks/useGetSuggestedUsers';
 import { setSuggestedUsers } from '@/redux/authSlice';
+import { server } from '@/constant/config';
 
 const SuggestedUsers = () => {
     const dispatch = useDispatch();
@@ -72,7 +73,7 @@ const SuggestedUsers = () => {
                                 <div className='flex items-center gap-2'>
                                     <Link to={`/profile/${userData?._id}`}>
                                         <Avatar>
-                                            <AvatarImage src={`http://localhost:8000/${userData?.profilePicture.replace(/\/{2,}/g, '/')}`} alt="profile_picture" />
+                                            <AvatarImage src={`${server}/${userData?.profilePicture.replace(/\/{2,}/g, '/')}`} alt="profile_picture" />
                                             <AvatarFallback>CN</AvatarFallback>
                                         </Avatar>
                                     </Link>

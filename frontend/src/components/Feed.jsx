@@ -1,14 +1,24 @@
-import React from 'react'
-import Posts from './Posts'
-import Stories from './Stories'
+import React from 'react';
+import Posts from './Posts';
+import Stories from './Stories';
+import { useSelector } from 'react-redux';
 
 const Feed = () => {
-  return (
-    <div className='flex-1 bg-black flex flex-col items-center w-full sm:w-full md:w-auto'>
-        <Stories/>
-        <Posts/>
-    </div>
-  )
-}
+  const { menu } = useSelector(store => store.menu)
 
-export default Feed
+  return (
+<div
+  className={`flex-1 ml-0 ${menu ? 
+    ' lg:ml-[6%] lg:w-[calc(100%-6%)]' 
+    : 
+    ' lg:ml-[16%] lg:w-[calc(100%-16%)]'
+  } bg-black flex flex-col items-center justify-center`}
+>
+  <Stories />
+  <Posts />
+</div>
+
+  );
+};
+
+export default Feed;

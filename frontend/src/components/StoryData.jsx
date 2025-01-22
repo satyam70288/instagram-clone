@@ -8,6 +8,7 @@ import { setStories } from '@/redux/storySlice';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import axios from 'axios';
+import { server } from '@/constant/config';
 
 const StoryData = () => {
   const [openCreateStory, setOpenCreateStory] = useState(false);
@@ -76,7 +77,7 @@ const StoryData = () => {
               }}
             >
               <img
-                src={`http://localhost:8000/${story?.media}`}
+                src={`${server}/${story?.media}`}
                 alt="Story"
                 className='w-full h-full object-cover rounded-full'
               />
