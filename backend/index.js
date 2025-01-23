@@ -41,7 +41,7 @@ app.use(cookieParser());
 
 // 🌐 CORS Configuration
 const corsOptions = {
-    origin: process.env.URL || "https://instagram-clone-vqkg-git-main-satyam70288s-projects.vercel.app/",
+    origin: process.env.URL || "https://instagram-clone-git-main-satyam70288s-projects.vercel.app/",
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
