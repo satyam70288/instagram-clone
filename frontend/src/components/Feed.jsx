@@ -9,9 +9,9 @@ const Feed = () => {
   return (
 <div
   className={`flex-1 ml-0 ${menu ? 
-    ' lg:ml-[6%] lg:w-[calc(100%-6%)]' 
+    ' lg:ml-[8%] lg:w-[calc(100%-6%)]' 
     : 
-    ' lg:ml-[16%] lg:w-[calc(100%-16%)]'
+    ' lg:ml-[20%] lg:w-[calc(100%-20%)]'
   } bg-black flex flex-col items-center justify-center`}
 >
   <Stories />
