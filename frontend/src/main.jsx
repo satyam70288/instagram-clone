@@ -10,7 +10,6 @@ import { persistStore } from 'redux-persist'
 let persistor=persistStore(store)
 import axios from 'axios'
 import { server } from './constant/config.js'
-// axios.defaults.baseURL = 'https://instagram-clone-3-kthd.onrender.com'
 axios.defaults.baseURL = server
 
 createRoot(document.getElementById('root')).render(
