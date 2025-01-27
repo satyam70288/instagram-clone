@@ -16,14 +16,12 @@ const PostData = ({ post }) => {
     const [text, setText] = useState("");
     const [open, setOpen] = useState(false);
     const { user, guest } = useSelector(store => store.auth);
-    console.log(user)
     const { posts } = useSelector(store => store.post);
     // Set default values if user is not logged in
     const [liked, setLiked] = useState(user ? post?.likes.includes(user?._id) : false);
     const [postLike, setPostLike] = useState(user ? post?.likes.length : 0);
     const [comment, setComment] = useState(user ? post?.comments : []);
     const dispatch = useDispatch();
-    console.log(post.image)
     const isFollowing = user ? post?.author?.followers.includes(user?._id) : false;
     const isVideo = (url) => {
         // Check if URL ends with common video file extensions
@@ -198,12 +196,16 @@ const PostData = ({ post }) => {
             ) : (
                 <img
                     className="rounded-md my-2 w-full aspect-square object-cover"
-                    src={`${server}/${post?.author?.profilePicture?.replaceAll('\\', '/')}`}
+                    src={guest ? post?.image : `${server}/${post?.image?.replaceAll('\\', '/')}`}
                     alt="post_image"
-                    onLoad={() => console.log(`Image URL: ${server}/${post?.author?.profilePicture?.replaceAll('\\', '/')}`)} // Log the image URL
-
+                    onLoad={() => {
+                        const imageUrl = guest ? post?.image : `${server}/${post?.image?.replaceAll('\\', '/')}`;
+                        console.log(`Image URL: ${imageUrl}`);
+                    }}
+                    onError={(e) => {
+                        console.error('Image failed to load', e);
+                    }}
                 />
-
             )}
 
             {/* Post Likes, Comments, and Action Buttons */}
