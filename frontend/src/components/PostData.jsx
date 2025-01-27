@@ -197,10 +197,15 @@ const PostData = ({ post }) => {
             ) : isPdf(post?.image) ? (
                 <embed className='rounded-md my-2 w-full aspect-square' src={`${server}/${post?.image.replace(/\\/g, '/')}`} type="application/pdf" width="100%" height="400px" alt="post_pdf" />
             ) : (
-                <img className='rounded-md my-2 w-full aspect-square object-cover' src={
-                    !guest ? `${server}/${post?.author?.profilePicture.replace(/\\/g, '/')}`
-                        : post?.image
-                } alt="post_image" />
+                <img
+                className="rounded-md my-2 w-full aspect-square object-cover"
+                src={
+                  guest
+                    ? post?.image
+                    : `${server}/${post?.author?.profilePicture?.replace(/\\/g, '/')}`
+                }
+                alt="post_image"
+              />              
             )}
 
             {/* Post Likes, Comments, and Action Buttons */}
