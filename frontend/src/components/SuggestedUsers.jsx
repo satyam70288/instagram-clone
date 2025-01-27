@@ -10,8 +10,13 @@ import { server } from '@/constant/config';
 
 const SuggestedUsers = () => {
     const dispatch = useDispatch();
-    const { suggestedUsers, user } = useSelector(store => store.auth);
+    const { suggestedUsers, user, guest } = useSelector(store => store.auth);
+    console.log(guest);
+    console.log(suggestedUsers);
+
+    // Only fetch suggested users if the user is not a guest
     const { data: fetchedUsers = [], isLoading = false, error = null } = useGetSuggestedUsers() || {};
+
     useEffect(() => {
         if (fetchedUsers && fetchedUsers.length > 0) {
             dispatch(setSuggestedUsers(fetchedUsers));
@@ -19,6 +24,11 @@ const SuggestedUsers = () => {
     }, [fetchedUsers, dispatch]);
 
     const followOrUnfollowHandler = async (id) => {
+        if (guest) {
+            toast.error("You must be logged in to follow/unfollow users.");
+            return;
+        }
+
         try {
             const res = await axios.post(`/api/v1/user/followorunfollow/${id}`, {}, {
                 withCredentials: true
@@ -26,16 +36,16 @@ const SuggestedUsers = () => {
 
             if (res.data.success) {
                 const updatedSuggestedUsers = suggestedUsers.map(userData =>
-                    userData._id === id
-                        ? {
-                            ...userData,
-                            followers: userData.followers.includes(user._id)
-                                ? userData.followers.filter(followerId => followerId !== user._id) // Unfollow: remove user._id
-                                : [...userData.followers, user._id] // Follow: add user._id
-                        }
-                        : userData
+                  userData._id === id
+                    ? {
+                        ...userData,
+                        followers: userData.followers.includes(user?._id || "")
+                          ? userData.followers.filter(followerId => followerId !== user?._id)
+                          : [...userData.followers, user?._id]
+                      }
+                    : userData
                 );
-                dispatch(setSuggestedUsers(updatedSuggestedUsers)); // Update state
+                dispatch(setSuggestedUsers(updatedSuggestedUsers));
                 toast.success(res.data.message);
             } else {
                 toast.error('Failed to follow/unfollow user.');
@@ -84,12 +94,19 @@ const SuggestedUsers = () => {
                                         <span className='text-gray-600 text-sm'>{userData?.bio || 'Bio here...'}</span>
                                     </div>
                                 </div>
+
+                                {/* Show message for guest users or allow interaction for logged-in users */}
                                 <span
                                     className={`${isFollowing ? "text-red-500" : "text-[#3BADF8]"} text-xs font-bold cursor-pointer hover:text-[#3495d6]`}
                                     onClick={() => followOrUnfollowHandler(userData?._id)}
+                                    disabled={guest} // Disable the button if the user is a guest
                                 >
                                     {isFollowing ? 'Unfollow' : 'Follow'}
                                 </span>
+
+                                {guest && (
+                                    <span className="text-xs text-gray-500">Log in to follow</span>
+                                )}
                             </div>
                         );
                     })

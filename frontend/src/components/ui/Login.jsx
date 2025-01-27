@@ -6,7 +6,7 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { setAuthUser } from '@/redux/authSlice';
+import { setAuthUser,enableGuestMode } from '@/redux/authSlice';
 import Cookies from 'js-cookie';  // Import js-cookie
 
 const Login = () => {
@@ -31,6 +31,7 @@ const Login = () => {
     e.preventDefault();
 
     try {
+     
       setLoading(true);
       const res = await axios.post('/api/v1/user/login', input, {
         headers: {
@@ -63,7 +64,10 @@ const Login = () => {
       setLoading(false);
     }
   };
-
+  const handleGuestAccess = () => {
+    dispatch(enableGuestMode());
+    navigate("/"); // Redirect to the homepage
+  };
   useEffect(() => {
     if (user) {
       navigate('/')
@@ -99,7 +103,7 @@ const Login = () => {
         <Button type="submit" disabled={loading}>
           {loading ? 'Logging in...' : 'Login'}
         </Button>
-        <span className='text-center' >Don't have an account? <Link className='text-blue-300' to='/signup'>Register</Link></span>
+        <span className='text-center' >Don't have an account? <Link className='text-blue-300 mr-2' to='/signup'>Register</Link> <Link className='text-blue-300' onClick={handleGuestAccess}>Guest</Link></span>
       </form>
     </div>
   );

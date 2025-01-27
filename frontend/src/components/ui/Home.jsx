@@ -71,7 +71,7 @@ const Home = () => {
 
   return (
     <div className=' md: ml-0 flex flex-col sm:flex-row'>
-      <div className={`md:ml-0 flex-1 bg-black sm:bg-[#F0F2F5] w-full sm:w-auto ${menu ? 'ml-[calc(100%-94%)]' : 'ml-[calc(100%-90%)]'}  flex-grow transition-all duration-700`}>
+      <div className={`md:ml-0 flex-1 bg-black sm:bg-[#F0F2F5] w-full sm:w-auto ${menu ? 'ml-[calc(100%-94%)]' : 'ml-[calc(100%-80%)]'}  flex-grow transition-all duration-700`}>
         <Feed />
         <Outlet />
       </div>

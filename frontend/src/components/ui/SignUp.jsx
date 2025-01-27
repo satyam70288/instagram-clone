@@ -8,14 +8,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
 const SignUp = () => {
-  const navigate=useNavigate()
-  const {user}=useSelector(store=>store.auth)
+  const navigate = useNavigate()
+  const { user } = useSelector(store => store.auth)
   const [input, setInput] = useState({
     username: "",
     email: "",
     password: ""
   });
-  const [loading,setLoading]=useState(false)
+  const [loading, setLoading] = useState(false)
 
   const handleChange = (e) => {
     setInput({
@@ -26,7 +26,7 @@ const SignUp = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     try {
       setLoading(true)
       const res = await axios.post('/api/v1/user/register', input, {
@@ -35,7 +35,7 @@ const SignUp = () => {
         },
         withCredentials: true // Ensure this is needed for your scenario
       });
-  
+
       if (res.data.success) {
         toast.success(res.data.message || 'Registration successful!');
         navigate('/login')
@@ -49,16 +49,16 @@ const SignUp = () => {
       toast.error(`Registration failed: ${errorMessage}`);
       console.error('Registration failed:', errorMessage);
     }
-    finally{
+    finally {
       setLoading(false)
     }
   };
-   useEffect(()=>{
-    if(user){
+  useEffect(() => {
+    if (user) {
       navigate('/')
     }
-   },[])
-  
+  }, [])
+
   return (
     <div className='flex items-center w-screen h-screen justify-center'>
       <form onSubmit={handleSubmit} className='shadow-lg flex flex-col gap-5 p-8'>
@@ -68,36 +68,45 @@ const SignUp = () => {
         </div>
         <div>
           <Label className='py-2 font-medium' htmlFor='username'>Username</Label>
-          <Input 
-            type="text" 
-            name="username" 
-            value={input.username} 
-            onChange={handleChange} 
+          <Input
+            type="text"
+            name="username"
+            value={input.username}
+            onChange={handleChange}
             className='focus-visible:ring-transparent'
           />
         </div>
         <div>
           <Label className='py-2 font-medium' htmlFor='email'>Email</Label>
-          <Input 
-            type="email" 
-            name="email" 
-            value={input.email} 
-            onChange={handleChange} 
+          <Input
+            type="email"
+            name="email"
+            value={input.email}
+            onChange={handleChange}
             className='focus-visible:ring-transparent'
           />
         </div>
         <div>
           <Label className='py-2 font-medium' htmlFor='password'>Password</Label>
-          <Input 
-            type="password" 
-            name="password" 
-            value={input.password} 
-            onChange={handleChange} 
+          <Input
+            type="password"
+            name="password"
+            value={input.password}
+            onChange={handleChange}
             className='focus-visible:ring-transparent'
           />
         </div>
         <Button type="submit">Sign Up</Button>
-        <span className='text-blue-300'>Alraedy have an account? <Link to='/login'>login</Link></span>
+        <span className="mr-7 flex items-center">
+          Already have an account?
+          <Link className="text-blue-300 ml-2" to="/login" >
+            Login
+          </Link>
+          <span className="mx-2 border-l border-gray-400 h-5"></span> {/* Vertical Line */}
+          <Link to="/guest" className="ml-2 text-blue-300 ">
+            Guest
+          </Link>
+        </span>
       </form>
     </div>
   );

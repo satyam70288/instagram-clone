@@ -20,6 +20,8 @@ import Following from './components/Following'
 import ExploreDetails from './components/ExploreDetails'
 import NotificationPage from './components/NotificationPage'
 import { server } from './constant/config'
+
+
 const browserRouter = createBrowserRouter([
   {
     path: "/",

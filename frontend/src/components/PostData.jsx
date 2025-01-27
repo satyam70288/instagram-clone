@@ -15,14 +15,16 @@ import { server } from '@/constant/config';
 const PostData = ({ post }) => {
     const [text, setText] = useState("");
     const [open, setOpen] = useState(false);
-    const { user } = useSelector(store => store.auth);
+    const { user, guest } = useSelector(store => store.auth);
+    console.log(user)
     const { posts } = useSelector(store => store.post);
-    const [liked, setLiked] = useState(post?.likes.includes(user?._id) || false);
-    const [postLike, setPostLike] = useState(post?.likes.length || 0);
-    const [comment, setComment] = useState(post?.comments || []);
+    // Set default values if user is not logged in
+    const [liked, setLiked] = useState(user ? post?.likes.includes(user?._id) : false);
+    const [postLike, setPostLike] = useState(user ? post?.likes.length : 0);
+    const [comment, setComment] = useState(user ? post?.comments : []);
     const dispatch = useDispatch();
-
-    const isFollowing = post?.author?.followers.includes(user?._id);
+    console.log(post.image)
+    const isFollowing = user ? post?.author?.followers.includes(user?._id) : false;
     const isVideo = (url) => {
         // Check if URL ends with common video file extensions
         return url.endsWith('.mp4') || url.endsWith('.mov') || url.endsWith('.avi');
@@ -85,7 +87,7 @@ const PostData = ({ post }) => {
     const deletePostHandler = async () => {
         const token = localStorage.getItem("authToken");
         console.log(token);
-    
+
         try {
             const res = await axios.delete(`/api/v1/post/delete/${post?._id}`, {
                 withCredentials: true,
@@ -93,7 +95,7 @@ const PostData = ({ post }) => {
                     // Authorization: `Bearer ${token}`, // Include the token in the Authorization header
                 },
             });
-    
+
             if (res.data.success) {
                 const updatedPostData = posts.filter(postItem => postItem._id !== post?._id);
                 dispatch(setPosts(updatedPostData));
@@ -104,7 +106,7 @@ const PostData = ({ post }) => {
             toast.error(error.response?.data?.message || 'An unexpected error occurred.');
         }
     };
-    
+
     const bookmarkHandler = async () => {
         try {
             const res = await axios.get(`/api/v1/post/${post?._id}/bookmark`, {
@@ -112,9 +114,7 @@ const PostData = ({ post }) => {
                 headers: {
                     Authorization: `Bearer ${token}`, // Include the token in the Authorization header
                 },
-            }
-            )
-                ;
+            });
             if (res.data.success) {
                 toast.success(res.data.message);
             }
@@ -130,7 +130,7 @@ const PostData = ({ post }) => {
                 headers: {
                     // Authorization: `Bearer ${token}`, // Include the token in the Authorization header
                 }
-            },);
+            });
 
             if (res.data.success) {
                 const isCurrentlyFollowing = post?.author?.followers.includes(user?._id);
@@ -156,10 +156,15 @@ const PostData = ({ post }) => {
 
     return (
         <div className=' my-8 w-full max-w-xs sm:max-w-sm md:max-w-md mx-auto border p-4 border-gray-300 bg-white rounded-lg shadow-lg'>
+            {/* Post Header and Avatar */}
             <div className='flex items-center justify-between'>
                 <div className='flex items-center gap-2'>
                     <Avatar>
-                        <AvatarImage src={`${server}/${post?.author?.profilePicture.replace(/\\/g, '/')}`} alt="post_image" />
+                        <AvatarImage
+                            src={
+                                !guest ? `${server}/${post?.author?.profilePicture.replace(/\\/g, '/')}`
+                                    : post?.image
+                            } />
                         <AvatarFallback>CN</AvatarFallback>
                     </Avatar>
                     <div className='flex items-center gap-3'>
@@ -167,6 +172,7 @@ const PostData = ({ post }) => {
                         {user?._id === post?.author?._id && <Badge variant="secondary">Author</Badge>}
                     </div>
                 </div>
+                {/* Post Options */}
                 <Dialog>
                     <DialogTrigger asChild>
                         <MoreHorizontal className='cursor-pointer text-gray-600 hover:text-gray-800 transition-colors' />
@@ -184,36 +190,20 @@ const PostData = ({ post }) => {
                     </DialogContent>
                 </Dialog>
             </div>
-            {/* <img
-                className='rounded-md my-2 w-full aspect-square object-cover'
-                src={`${server}/${post?.image.replace(/\\/g, '/')}`}
-                alt="post_img"
-            /> */}
-            {isVideo(post?.image) ? (
-                <video
-                    className='rounded-md my-2 w-full aspect-square object-cover'
-                    controls
-                    src={`${server}/${post?.image.replace(/\\/g, '/')}`}
-                    alt="post_video"
-                />
-            ) : isPdf(post?.image) ? ( // Check if the file is a PDF
-                <embed
-                    className='rounded-md my-2 w-full aspect-square'
-                    src={`${server}/${post?.image.replace(/\\/g, '/')}`}
-                    type="application/pdf"
-                    width="100%"
-                    height="400px" // Adjust the height as needed
-                    alt="post_pdf"
-                />
-            ) : (
-                <img
-                    className='rounded-md my-2 w-full aspect-square object-cover'
-                    src={`${server}/${post?.image.replace(/\\/g, '/')}`}
-                    alt="post_image"
-                />
 
+            {/* Post Image/Video/PDF */}
+            {isVideo(post?.image) ? (
+                <video className='rounded-md my-2 w-full aspect-square object-cover' controls src={`${server}/${post?.image.replace(/\\/g, '/')}`} alt="post_video" />
+            ) : isPdf(post?.image) ? (
+                <embed className='rounded-md my-2 w-full aspect-square' src={`${server}/${post?.image.replace(/\\/g, '/')}`} type="application/pdf" width="100%" height="400px" alt="post_pdf" />
+            ) : (
+                <img className='rounded-md my-2 w-full aspect-square object-cover' src={
+                    !guest ? `${server}/${post?.author?.profilePicture.replace(/\\/g, '/')}`
+                        : post?.image
+                } alt="post_image" />
             )}
 
+            {/* Post Likes, Comments, and Action Buttons */}
             <div className='flex items-center justify-between my-2'>
                 <div className='flex items-center gap-3'>
                     {liked
