@@ -161,10 +161,9 @@ const PostData = ({ post }) => {
                 <div className='flex items-center gap-2'>
                     <Avatar>
                         <AvatarImage
-                            src={
-                                !guest ? `${server}/${post?.author?.profilePicture.replace(/\\/g, '/')}`
-                                    : post?.image
-                            } />
+                            src={`${server}/${post?.author?.profilePicture?.replace(/\\/g, '/')}`}
+                        />
+
                         <AvatarFallback>CN</AvatarFallback>
                     </Avatar>
                     <div className='flex items-center gap-3'>
@@ -198,14 +197,11 @@ const PostData = ({ post }) => {
                 <embed className='rounded-md my-2 w-full aspect-square' src={`${server}/${post?.image.replace(/\\/g, '/')}`} type="application/pdf" width="100%" height="400px" alt="post_pdf" />
             ) : (
                 <img
-                className="rounded-md my-2 w-full aspect-square object-cover"
-                src={
-                  guest
-                    ? post?.image
-                    : `${server}/${post?.author?.profilePicture?.replace(/\\/g, '/')}`
-                }
-                alt="post_image"
-              />              
+                    className="rounded-md my-2 w-full aspect-square object-cover"
+                    src={`${server}/${post?.author?.profilePicture?.replaceAll('\\', '/')}`}
+                    alt="post_image"
+                />
+
             )}
 
             {/* Post Likes, Comments, and Action Buttons */}
