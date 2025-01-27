@@ -200,6 +200,8 @@ const PostData = ({ post }) => {
                     className="rounded-md my-2 w-full aspect-square object-cover"
                     src={`${server}/${post?.author?.profilePicture?.replaceAll('\\', '/')}`}
                     alt="post_image"
+                    onLoad={() => console.log(`Image URL: ${server}/${post?.author?.profilePicture?.replaceAll('\\', '/')}`)} // Log the image URL
+
                 />
 
             )}
