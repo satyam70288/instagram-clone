@@ -22,14 +22,17 @@ const __dirname = path.resolve();
 const app = express();
 const server = createServer(app);
 
-
 // 📡 Socket.IO Configuration
 const io = new Server(server, {
-    cors: {
-        origin: process.env.URL || "http://localhost:5173", // Frontend URL
-        methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-        credentials: true,
-    },
+  cors: {
+    origin: [
+      process.env.FRONTEND_URL || "http://localhost:5173", // ✅ ENV value or localhost
+      "https://instagram-clone-git-main-satyam70288s-projects.vercel.app",
+      "https://instagram-clone-nine-lake.vercel.app",
+    ],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    credentials: true,
+  },
 });
 
 // Initialize Socket.IO
@@ -39,23 +42,38 @@ initializeSocketIO(io);
 app.use(express.json());
 app.use(cookieParser());
 
-// 🌐 CORS Configuration
-const corsOptions = {
-    origin: process.env.URL || "https://instagram-clone-git-main-satyam70288s-projects.vercel.app/",
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    exposedHeaders: ['Authorization'],
-};
-app.use(cors(corsOptions));
+// 🌐 CORS Configuration for Express
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      const allowedOrigins = [
+        "http://localhost:5173",
+        process.env.FRONTEND_URL,
+        "https://instagram-clone-git-main-satyam70288s-projects.vercel.app",
+        "https://instagram-clone-nine-lake.vercel.app",
+      ];
 
-// Handle preflight requests explicitly
-app.options('*', cors(corsOptions));
+      // Allow Vercel preview deploys: https://swag-fashion-*.vercel.app
+      const isVercelPreview =
+        origin && /^https:\/\/swag-fashion.*\.vercel\.app$/.test(origin);
+
+      if (!origin || allowedOrigins.includes(origin) || isVercelPreview) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    exposedHeaders: ["Authorization"],
+  })
+);
 
 // 📝 Logging Middleware (for debugging)
 app.use((req, res, next) => {
-    console.log('Incoming request:', req.method, req.url);
-    next();
+  console.log("Incoming request:", req.method, req.url);
+  next();
 });
 
 // 📦 API Routes
@@ -64,28 +82,23 @@ app.use("/api/v1/post", postRoute);
 app.use("/api/v1/message", messageRoute);
 app.use("/api/v1/story", storyRoute);
 app.use("/api/v1/notification", notificationRoute);
-//📂 Serve Public Folder
 
-// ⚙️ Serve Frontend (Static Files)
-// Serve the public folder
-// Serve Frontend Build (dist)
-app.use(express.static(path.join(__dirname, '/frontend/dist')));
+// ⚙️ Serve Frontend Build (dist)
+app.use(express.static(path.join(__dirname, "/frontend/dist")));
 
 // Serve Public Folder (images, etc.)
-app.use('/public', express.static(path.join(__dirname, 'public')));
-
-
+app.use("/public", express.static(path.join(__dirname, "public")));
 
 // ⚠️ Global Error Handling Middleware
 app.use((err, req, res, next) => {
-    console.error('Error:', err.stack);
-    res.status(err.status || 500).json({ message: err.message });
+  console.error("Error:", err.stack);
+  res.status(err.status || 500).json({ message: err.message });
 });
 
 // 🚀 Start Server and Connect to Database
 server.listen(PORT, () => {
-    connectDB();
-    console.log(`✅ Server running on http://localhost:${PORT}`);
+  connectDB();
+  console.log(`✅ Server running on http://localhost:${PORT}`);
 });
 
 export { io };
