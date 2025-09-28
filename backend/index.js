@@ -48,7 +48,8 @@ app.use(
     origin: function (origin, callback) {
       const allowedOrigins = [
         "http://localhost:5173",
-        process.env.FRONTEND_URL,
+        process.env.FRONTEND_URL, // ✅ env se read karega
+        "https://clone-insta-2.netlify.app",
         "https://instagram-clone-git-main-satyam70288s-projects.vercel.app",
         "https://instagram-clone-nine-lake.vercel.app",
       ];
