@@ -1,60 +1,92 @@
 // src/services/api.js
 import { server } from '@/constant/config';
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { clearAuthToken, getAuthToken } from '@/lib/authStorage';
+import { removeAuthUser } from '@/redux/authSlice';
+import { setPosts, setSelectedPost } from '@/redux/postSlice';
+import { toast } from 'sonner';
+
+const rawBaseQuery = fetchBaseQuery({
+  baseUrl: `${server}/api/v1`,
+  credentials: 'include',
+  prepareHeaders: (headers) => {
+    const token = getAuthToken();
+    if (token) {
+      headers.set('Authorization', `Bearer ${token}`);
+    }
+    return headers;
+  },
+});
+
+let rtkLoggingOut = false;
+
+const baseQueryWithAuth = async (args, api, extraOptions) => {
+  const result = await rawBaseQuery(args, api, extraOptions);
+  const status = result.error?.status;
+  const message = result.error?.data?.message || '';
+
+  if (status === 401) {
+    const state = api.getState();
+    if (!state.auth?.guest && state.auth?.user && !rtkLoggingOut) {
+      rtkLoggingOut = true;
+      clearAuthToken();
+      api.dispatch(removeAuthUser());
+      api.dispatch(setSelectedPost(null));
+      api.dispatch(setPosts([]));
+      toast.error(
+        /expired/i.test(message)
+          ? 'Your session has expired. Please log in again.'
+          : 'Please log in again to continue.'
+      );
+      if (!window.location.pathname.includes('/login')) {
+        window.location.assign('/login');
+      }
+      setTimeout(() => {
+        rtkLoggingOut = false;
+      }, 2500);
+    }
+  }
+
+  return result;
+};
 
 export const apiSlice = createApi({
   reducerPath: 'api',
-  baseQuery: fetchBaseQuery({ 
-    baseUrl: `${server}/api/v1`,
-    credentials: 'include',
-    prepareHeaders: (headers) => {
-      const token = localStorage.getItem('authToken');
-      if (token) {
-        headers.set('Authorization', `Bearer ${token}`);
-      }
-      return headers;
-    },
-  }),
-  tagTypes: ['User', 'Posts', 'Notification'],  // Define tagTypes used in the API
+  baseQuery: baseQueryWithAuth,
+  tagTypes: ['User', 'Posts', 'Notification'],
   endpoints: (builder) => ({
-    // Mutation to follow or unfollow a user
     followOrUnfollowUser: builder.mutation({
       query: (id) => ({
         url: `/user/followorunfollow/${id}`,
         method: 'POST',
       }),
-      invalidatesTags: ['User'],  // Invalidate 'User' cache on follow/unfollow
+      invalidatesTags: ['User'],
     }),
-    
-    // Query to get followers or following of a user
+
     getFollowingOrFollower: builder.query({
       query: (userId) => `/user/getFollowingOrFollower/${userId}`,
-      providesTags: ['User'],  // Provide 'User' cache for followers or following list
+      providesTags: ['User'],
     }),
 
-    // Query to explore posts
     explorePost: builder.query({
       query: () => `/post/explore`,
-      providesTags: ['Posts'],  // Provide 'Posts' cache for explore posts
+      providesTags: ['Posts'],
     }),
 
-    // Query to search users based on a query string
     searchUser: builder.query({
       query: (query) => ({
         url: '/user/search',
         method: 'GET',
-        params: { query },  // Pass the search query as a parameter
+        params: { query },
       }),
-      providesTags: ['Users'],  // Provide 'Users' cache for search results
+      providesTags: ['Users'],
     }),
 
-    // Query to get all notifications
     notification: builder.query({
       query: () => `/notification/all`,
-      providesTags: ['Notification'],  // Provide 'Notification' cache for notifications
+      providesTags: ['Notification'],
     }),
 
-    // Mutation to mark a notification as read
     markAsRead: builder.mutation({
       query: (id) => ({
         url: `/notification/update/${id}`,
@@ -65,12 +97,11 @@ export const apiSlice = createApi({
   }),
 });
 
-// Export hooks for each query and mutation to use in functional components
-export const { 
-  useFollowOrUnfollowUserMutation, 
+export const {
+  useFollowOrUnfollowUserMutation,
   useGetFollowingOrFollowerQuery,
   useExplorePostQuery,
-  useSearchUserQuery, 
+  useSearchUserQuery,
   useNotificationQuery,
   useMarkAsReadMutation
 } = apiSlice;

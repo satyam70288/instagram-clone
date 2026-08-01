@@ -7,27 +7,17 @@ import { Provider } from 'react-redux'
 import store from './redux/store.js'
 import { PersistGate } from 'redux-persist/integration/react'
 import { persistStore } from 'redux-persist'
-let persistor=persistStore(store)
-import axios from 'axios'
-import { server } from './constant/config.js'
-import { getAuthToken } from './lib/authStorage.js'
-axios.defaults.baseURL = server
-axios.defaults.withCredentials = true
-axios.interceptors.request.use((config) => {
-  const token = getAuthToken();
-  if (token) {
-    config.headers = config.headers || {};
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+import { setupAxiosAuth } from './lib/setupAxiosAuth.js'
+
+const persistor = persistStore(store)
+setupAxiosAuth(store)
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
-      <App />
-    <Toaster/>
+        <App />
+        <Toaster />
       </PersistGate>
     </Provider>
   </StrictMode>,
