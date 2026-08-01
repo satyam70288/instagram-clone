@@ -425,13 +425,22 @@ export const googleLogin = async (req, res) => {
             });
         }
 
-        const { OAuth2Client } = await import('google-auth-library');
-        const client = new OAuth2Client(googleClientId);
-        const ticket = await client.verifyIdToken({
-            idToken: credential,
-            audience: googleClientId,
-        });
-        const payload = ticket.getPayload();
+        let payload;
+        try {
+            const { OAuth2Client } = await import('google-auth-library');
+            const client = new OAuth2Client(googleClientId);
+            const ticket = await client.verifyIdToken({
+                idToken: credential,
+                audience: googleClientId,
+            });
+            payload = ticket.getPayload();
+        } catch (verifyError) {
+            console.error('Google token verification failed:', verifyError?.message || verifyError);
+            return res.status(401).json({
+                success: false,
+                message: `Google token verification failed: ${verifyError?.message || 'unknown error'}`,
+            });
+        }
 
         if (!payload?.email || !payload?.email_verified) {
             return res.status(401).json({
@@ -513,17 +522,9 @@ export const googleLogin = async (req, res) => {
             });
     } catch (error) {
         console.error('Google login error:', error?.message || error);
-        const detail = error?.message || '';
-        // Audience mismatch usually means Render GOOGLE_CLIENT_ID != frontend Client ID
-        if (/audience|Wrong recipient|invalid token signature|Token used too/i.test(detail)) {
-            return res.status(401).json({
-                success: false,
-                message: 'Google token verification failed. Check that backend GOOGLE_CLIENT_ID matches the frontend Client ID.',
-            });
-        }
-        return res.status(401).json({
+        return res.status(500).json({
             success: false,
-            message: 'Google login failed. Invalid or expired Google token.',
+            message: `Google login failed: ${error?.message || 'unexpected server error'}`,
         });
     }
 };

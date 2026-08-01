@@ -3,6 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import path from "path";
+import mongoose from "mongoose";
 import { createServer } from "http";
 import { Server } from "socket.io";
 
@@ -75,6 +76,17 @@ app.use(
 app.use((req, res, next) => {
   console.log("Incoming request:", req.method, req.url);
   next();
+});
+
+// 🩺 Health check — reports whether the database is actually reachable
+app.get("/api/v1/health", (req, res) => {
+  const states = ["disconnected", "connected", "connecting", "disconnecting"];
+  const state = mongoose.connection.readyState;
+  res.status(state === 1 ? 200 : 503).json({
+    success: state === 1,
+    database: states[state] || "unknown",
+    mongoUriConfigured: Boolean(process.env.MONGO_URI),
+  });
 });
 
 // 📦 API Routes
