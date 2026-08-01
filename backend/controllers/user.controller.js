@@ -171,18 +171,23 @@ export const login = async (req, res) => {
             lastLoginAt: user.lastLoginAt
         };
 
-        // Set the token as a cookie and also send it in the response headers
+        const isProd = process.env.NODE_ENV === 'production';
+        const cookieOptions = {
+            httpOnly: true,
+            sameSite: isProd ? 'None' : 'Lax',
+            secure: isProd,
+            maxAge: 24 * 60 * 60 * 1000,
+        };
+
+        // Set the token as a cookie and also send it in the response body/headers
         return res
             .header('Authorization', `Bearer ${token}`)
-            .cookie('token', token, {   httpOnly: true,
-                sameSite: 'None',  // Ensures cookies can be sent in cross-origin requests
-                secure: true,  // Ensures the cookie is only sent over HTTPS (required for sameSite: 'None')
-                maxAge: 24 * 60 * 60 * 1000,
-               })
+            .cookie('token', token, cookieOptions)
             .json({
                 message: `Welcome back ${user.username}`,
                 success: true,
-                user: userData
+                user: userData,
+                token,
             });
     } catch (error) {
         console.error("Error during login:", error);
@@ -196,7 +201,13 @@ export const login = async (req, res) => {
 export const logout = async (_, res) => {
     console.log('logout');
     try {
-        return res.cookie("token", "", { maxAge: 0 }).json({
+        const isProd = process.env.NODE_ENV === 'production';
+        return res.cookie("token", "", {
+            httpOnly: true,
+            sameSite: isProd ? 'None' : 'Lax',
+            secure: isProd,
+            maxAge: 0,
+        }).json({
             message: 'Logged out successfully.',
             success: true
         });

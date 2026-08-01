@@ -1,7 +1,7 @@
 import {Conversation} from "../models/conversation.model.js";
-import { getReceiverSocketId } from "../socket/socket.js";
+import { getIO, getReceiverSocketId } from "../socket/socket.js";
 import {Message} from "../models/message.model.js"
-// import {io} from '../index.js'
+
 // for chatting
 export const sendMessage = async (req,res) => {
     try {
@@ -30,7 +30,8 @@ export const sendMessage = async (req,res) => {
 
         // implement socket io for real time data transfer
         const receiverSocketId = getReceiverSocketId(receiverId);
-        if(receiverSocketId){
+        const io = getIO();
+        if(receiverSocketId && io){
             io.to(receiverSocketId).emit('newMessage', newMessage);
         }
 
@@ -40,6 +41,10 @@ export const sendMessage = async (req,res) => {
         })
     } catch (error) {
         console.log(error);
+        return res.status(500).json({
+            success: false,
+            message: 'Failed to send message',
+        });
     }
 }
 export const getMessage = async (req,res) => {

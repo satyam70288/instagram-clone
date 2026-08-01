@@ -1,43 +1,39 @@
-import { setMessages } from "@/redux/chatSlice";
-import { setPosts } from "@/redux/postSlice";
-import axios from "axios";
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { toast } from "sonner";
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import { toast } from 'sonner';
 
 const useSeenNotification = (id) => {
-
-  // Step 1: Create state variables within the hook
-  const [notifications, setNotifications] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
 
   useEffect(() => {
-    const fetchAllNotifications = async () => {
+    if (!id) return;
+
+    const markSeen = async () => {
       try {
-        setLoading(true); // Set loading state to true when fetching starts
-        const res = await axios.patch(
-          `/api/v1/update/${id}`,
+        setLoading(true);
+        setError(null);
+        const res = await axios.put(
+          `/api/v1/notification/update/${id}`,
+          {},
           { withCredentials: true }
         );
         if (res.data.success) {
-            console.log(res.data);
-          // Update notifications state
+          setSuccess(true);
           toast.success(res.data.message);
         }
-      } catch (error) {
-        console.log(error);
-        setError(error); // Set error state in case of a failure
+      } catch (err) {
+        setError(err);
       } finally {
-        setLoading(false); // Set loading to false when fetching is complete
+        setLoading(false);
       }
     };
-      fetchAllNotifications();
-    
+
+    markSeen();
   }, [id]);
 
-  // Step 2: Return the state variables from the custom hook
-  return { notifications, loading, error };
+  return { loading, error, success };
 };
 
 export default useSeenNotification;

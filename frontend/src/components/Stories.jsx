@@ -1,6 +1,4 @@
-import React from 'react';
 import StoryData from './StoryData';
-import { Heart, Home, LogOut, MessageCircle, Search } from 'lucide-react';
 
 const Stories = () => {
   return (

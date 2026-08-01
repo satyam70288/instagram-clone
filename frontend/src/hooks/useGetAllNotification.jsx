@@ -1,12 +1,11 @@
 import { setMessages } from "@/redux/chatSlice";
-import { setPosts } from "@/redux/postSlice";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 const useGetAllNotification = () => {
   const dispatch = useDispatch();
-  const { selectedUser } = useSelector((store) => store.auth);
+  const { guest } = useSelector((store) => store.auth);
 
   // Step 1: Create state variables within the hook
   const [notifications, setNotifications] = useState([]);
@@ -14,6 +13,10 @@ const useGetAllNotification = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    if (guest) {
+      setLoading(false);
+      return;
+    }
     const fetchAllNotifications = async () => {
       try {
         setLoading(true); // Set loading state to true when fetching starts
@@ -36,7 +39,7 @@ const useGetAllNotification = () => {
     };
       fetchAllNotifications();
     
-  }, []);
+  }, [dispatch, guest]);
 
   // Step 2: Return the state variables from the custom hook
   return { notifications, loading, error };

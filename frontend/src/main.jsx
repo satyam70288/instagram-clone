@@ -10,7 +10,17 @@ import { persistStore } from 'redux-persist'
 let persistor=persistStore(store)
 import axios from 'axios'
 import { server } from './constant/config.js'
+import { getAuthToken } from './lib/authStorage.js'
 axios.defaults.baseURL = server
+axios.defaults.withCredentials = true
+axios.interceptors.request.use((config) => {
+  const token = getAuthToken();
+  if (token) {
+    config.headers = config.headers || {};
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

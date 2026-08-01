@@ -1,5 +1,3 @@
-import { setMessages } from "@/redux/chatSlice";
-import { setPosts } from "@/redux/postSlice";
 import { setStories } from "@/redux/storySlice";
 import axios from "axios";
 import { useEffect } from "react";
@@ -7,7 +5,9 @@ import { useDispatch, useSelector } from "react-redux";
 
 const useGetAllStory = () => {
     const dispatch = useDispatch();
+    const { guest } = useSelector((store) => store.auth);
     useEffect(() => {
+        if (guest) return;
         const fetchAllStory = async () => {
             try {
                 const res = await axios.get(`/api/v1/story/get/`, { withCredentials: true });
@@ -19,6 +19,6 @@ const useGetAllStory = () => {
             }
         }
         fetchAllStory();
-    }, []);
+    }, [dispatch, guest]);
 };
 export default useGetAllStory;

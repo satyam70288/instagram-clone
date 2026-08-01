@@ -8,13 +8,13 @@ const authSlice = createSlice({
     suggestedUsers: [],
     userProfile: null,
     selectedUser: null,
-    posts: [],  // Posts array will hold the posts for the guest user
+    posts: [],
   },
   reducers: {
     // actions
     setAuthUser: (state, action) => {
       state.user = action.payload;
-      state.guest = false;  // If a real user logs in, disable guest mode
+      state.guest = false;
     },
     setSuggestedUsers: (state, action) => {
       state.suggestedUsers = action.payload;
@@ -26,112 +26,79 @@ const authSlice = createSlice({
       state.selectedUser = action.payload;
     },
     removeAuthUser: (state) => {
-      state.user = null;  // Reset user data when expired or logged out
+      state.user = null;
       state.guest = false;
       state.suggestedUsers = [];
       state.userProfile = null;
       state.selectedUser = null;
-      state.posts = [];  // Clear posts when the user logs out
+      state.posts = [];
     },
     enableGuestMode: (state) => {
       state.guest = true;
       state.user = {
-        id: "guest",
-        username: "Guest User",
-        profilePicture: "https://via.placeholder.com/150", // Default guest avatar
-        bio: "Welcome! You are exploring as a guest.",
+        _id: "guest",
+        username: "guest",
+        profilePicture: "https://api.dicebear.com/9.x/thumbs/svg?seed=Guest",
+        bio: "Exploring PicShare in read-only mode.",
       };
       state.userProfile = {
-        id: "guest",
-    username: "Guest User",
-    profilePicture: "https://via.placeholder.com/150", // Default guest avatar
-    bio: "Welcome! You are exploring as a guest.",
-    posts: [],
-    followers: [
-      { id: "user1", username: "User One" },
-      { id: "user2", username: "User Two" },
-      // You can add more followers here
-    ],
-    following: [
-      { id: "user3", username: "User Three" },
-      { id: "user4", username: "User Four" },
-      // You can add more following users here
-    ]
+        _id: "guest",
+        username: "guest",
+        profilePicture: "https://api.dicebear.com/9.x/thumbs/svg?seed=Guest",
+        bio: "Exploring PicShare in read-only mode.",
+        posts: [],
+        followers: [],
+        following: [],
       };
       state.selectedUser = null;
 
-      // Dummy suggested users for guest mode
       state.suggestedUsers = [
         {
-          id: "user1",
-          username: "John Doe",
-          profilePicture: "https://via.placeholder.com/150?text=John",
-          bio: "Loves coding and coffee.",
-          followers: [
-            { id: "user1", username: "User One" },
-            { id: "user2", username: "User Two" }
-          ],
-          following: [
-            { id: "user3", username: "User Three" },
-            { id: "user4", username: "User Four" }
-          ]
+          _id: "user1",
+          username: "maya.travels",
+          profilePicture: "https://randomuser.me/api/portraits/women/44.jpg",
+          bio: "Travel, light & little moments",
+          followers: [],
         },
         {
-          id: "user2",
-          username: "Jane Smith",
-          profilePicture: "https://via.placeholder.com/150?text=Jane",
-          bio: "Traveler and photographer.",
-          followers: [
-            { id: "user1", username: "User One" },
-            { id: "user3", username: "User Three" }
-          ],
-          following: [
-            { id: "user4", username: "User Four" }
-          ]
+          _id: "user2",
+          username: "noah.creates",
+          profilePicture: "https://randomuser.me/api/portraits/men/32.jpg",
+          bio: "Designer and weekend photographer",
+          followers: [],
         },
         {
-          id: "user3",
-          username: "Alice Johnson",
-          profilePicture: "https://via.placeholder.com/150?text=Alice",
-          bio: "Tech enthusiast and gamer.",
-          followers: [
-            { id: "user1", username: "User One" }
-          ],
-          following: [
-            { id: "user2", username: "User Two" },
-            { id: "user4", username: "User Four" }
-          ]
-        },
-        {
-          id: "user4",
-          username: "Bob Brown",
-          profilePicture: "https://via.placeholder.com/150?text=Bob",
-          bio: "Web designer and writer.",
-          followers: [
-            { id: "user2", username: "User Two" }
-          ],
-          following: [
-            { id: "user3", username: "User Three" }
-          ]
+          _id: "user3",
+          username: "sophia.foods",
+          profilePicture: "https://randomuser.me/api/portraits/women/68.jpg",
+          bio: "Simple recipes, beautifully shared",
+          followers: [],
         }
       ];
       
-      // Default posts for the guest
       state.posts = [
         {
-          id: "post1",
-          caption: "Welcome to the platform! Feel free to browse around.",
-          image: "https://via.placeholder.com/500",
-          author: state.user,
-          likes: 0,
+          _id: "post1",
+          caption: "Slow mornings, warm coffee, and nowhere else to be.",
+          image: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=900&q=85",
+          author: state.suggestedUsers[0],
+          likes: ["user2", "user3"],
           comments: [],
         },
         {
-          id: "post2",
-          caption: "Guest user’s first post! Explore without logging in.",
-          image: "",
-          author: state.user,
-          likes: 0,
+          _id: "post2",
+          caption: "Finding inspiration in clean lines and quiet spaces.",
+          image: "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=900&q=85",
+          author: state.suggestedUsers[1],
+          likes: ["user1", "user3", "user4"],
+          comments: [],
+        },
+        {
+          _id: "post3",
+          caption: "A little color makes every day better.",
+          image: "https://images.unsplash.com/photo-1497250681960-ef046c08a56e?auto=format&fit=crop&w=900&q=85",
+          author: state.suggestedUsers[2],
+          likes: ["user1", "user2", "user4", "user5"],
           comments: [],
         },
       ];

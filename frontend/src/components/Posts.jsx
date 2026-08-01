@@ -1,12 +1,12 @@
-import React from 'react';
 import PostData from './PostData';
 import { useSelector } from 'react-redux';
 
 const Posts = () => {
   const { posts } = useSelector((store) => store.post);
+  const { guest, posts: guestPosts } = useSelector((store) => store.auth);
 
   // Use dummy data if posts are not available
-  const post = posts?.length > 0 ? posts : [
+  const post = guest ? guestPosts : posts?.length > 0 ? posts : [
     {
       _id: '1',
       author: {
@@ -74,8 +74,8 @@ const Posts = () => {
   ];
 
   return (
-    <div className='bg-black w-full flex flex-col items-center justify-center flex-wrap'>
-      <div>
+    <div className='w-full'>
+      <div className='space-y-5 py-4'>
         {post?.map((post) => (
           <PostData key={post._id} post={post} />
         ))}

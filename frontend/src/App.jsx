@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import SignUp from './components/ui/SignUp'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import MainLayout from './components/ui/MainLayout'
@@ -82,12 +82,12 @@ const browserRouter = createBrowserRouter([
 
 
 const App = () => {
-  const { user } = useSelector((state) => state.auth);
+  const { user, guest } = useSelector((state) => state.auth);
   const { socket } = useSelector(store => store.socketio);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (user) {
+    if (user && !guest) {
       const socketio = io(`${server}`, {
         query: {
           userId: user?._id
@@ -114,7 +114,7 @@ const App = () => {
       socket.close();
       dispatch(setSocket(null));
     }
-  }, [user, dispatch]);
+  }, [user, guest, dispatch]);
 
   return (
     <>

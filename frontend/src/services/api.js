@@ -6,7 +6,14 @@ export const apiSlice = createApi({
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({ 
     baseUrl: `${server}/api/v1`,
-    credentials: 'include',  // Ensure credentials are included for cross-origin requests if required
+    credentials: 'include',
+    prepareHeaders: (headers) => {
+      const token = localStorage.getItem('authToken');
+      if (token) {
+        headers.set('Authorization', `Bearer ${token}`);
+      }
+      return headers;
+    },
   }),
   tagTypes: ['User', 'Posts', 'Notification'],  // Define tagTypes used in the API
   endpoints: (builder) => ({
@@ -51,9 +58,9 @@ export const apiSlice = createApi({
     markAsRead: builder.mutation({
       query: (id) => ({
         url: `/notification/update/${id}`,
-        method: 'PATCH',  // Use PATCH to update the notification status
+        method: 'PUT',
       }),
-      invalidatesTags: ['Notification'],  // Invalidate 'Notification' cache to refresh notifications
+      invalidatesTags: ['Notification'],
     }),
   }),
 });

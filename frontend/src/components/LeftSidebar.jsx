@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Heart, Home, LogOut, MessageCircle, PlusSquare, Search, SquarePlay, TrendingUp } from 'lucide-react';
+import { useState } from 'react';
+import { Camera, Heart, Home, LogIn, LogOut, MessageCircle, PlusSquare, Search, SquarePlay, TrendingUp } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
@@ -10,16 +10,17 @@ import { Popover, PopoverContent } from './ui/popover';
 import { PopoverTrigger } from '@radix-ui/react-popover';
 import { Menu } from 'lucide-react';
 import { Button } from './ui/button';
-import { setAuthUser } from '@/redux/authSlice';
+import { removeAuthUser } from '@/redux/authSlice';
 import { setPosts, setSelectedPost } from '@/redux/postSlice';
 import SearchPage from './SearchPage';
 import { setMenuHadlar } from '@/redux/menuSlice';
+import { clearAuthToken } from '@/lib/authStorage';
 const LeftSidebar = () => {
     const navigate = useNavigate();
     const [open, setOpen] = useState(false);
     const [menu, setMenu] = useState(false)
     const [searchActive, setSearchActive] = useState(false); // New state for SearchPage
-    const { user } = useSelector(state => state.auth);
+    const { user, guest } = useSelector(state => state.auth);
     const dispatch = useDispatch();
     const { likeNotification } = useSelector(state => state.realTimeNotification);
 
@@ -28,23 +29,46 @@ const LeftSidebar = () => {
         dispatch(setMenuHadlar(!menu));
     };
     const logOutHandler = async () => {
+        if (guest) {
+            dispatch(removeAuthUser());
+            dispatch(setSelectedPost(null));
+            dispatch(setPosts([]));
+            clearAuthToken();
+            navigate('/login');
+            toast.success('Guest session ended');
+            return;
+        }
         try {
             const res = await axios.get('/api/v1/user/logout', { withCredentials: true });
-            console.log(res);
             if (res.data.success) {
-                dispatch(setAuthUser(null));
+                dispatch(removeAuthUser());
                 dispatch(setSelectedPost(null));
                 dispatch(setPosts([]));
+                clearAuthToken();
                 navigate('/login');
                 toast.success(res.data.message);
             }
         } catch (error) {
-            console.log(error.response);
-            toast.error(error.response?.data?.message || 'Logout failed');
+            // Still clear local session if API fails
+            dispatch(removeAuthUser());
+            dispatch(setSelectedPost(null));
+            dispatch(setPosts([]));
+            clearAuthToken();
+            navigate('/login');
+            toast.error(error.response?.data?.message || 'Logged out locally');
         }
     };
 
     const sidebarHandler = (textType) => {
+        if (textType === 'Log in') {
+            logOutHandler();
+            return;
+        }
+        if (guest && ['Create', 'Messages', 'Notifications', 'Profile', 'Search'].includes(textType)) {
+            toast.info('Log in or create an account to use this feature.');
+            navigate('/login');
+            return;
+        }
         if (textType === 'Logout') {
             logOutHandler();
         } else if (textType === "Create") {
@@ -85,20 +109,25 @@ const LeftSidebar = () => {
             ),
             text: "Profile"
         },
-        { icon: <LogOut />, text: "Logout" },
+        { icon: guest ? <LogIn /> : <LogOut />, text: guest ? "Log in" : "Logout" },
     ];
 
     return (
-        <div className={`hidden lg:block transition-all duration-500  ${menu ? 'sm:w-[9%] md:w-[10%] lg:w-[6%]' : 'sm:w-[16%] md:w-[25%] lg:w-[16%]'}  md:fixed top-0 z-10 left-0 px-4 h-screen border-r border-gray-300 bg-[#1C1C1C] text-white`}>
-            <Menu className="w-10 h-10 ml-auto" onClick={menuHandler} />
-            <div className='flex flex-col '>
-                <h1 className='md:hidden my-8 font-bold text-xl'>LOGO</h1>
+        <div className={`hidden lg:block transition-all duration-300 ${menu ? 'lg:w-[6%]' : 'lg:w-[16%]'} fixed top-0 z-10 left-0 px-3 h-screen border-r border-slate-200 bg-white text-slate-700`}>
+            <div className={`my-7 flex items-center ${menu ? 'justify-center' : 'justify-between px-2'}`}>
+                <button onClick={() => navigate('/')} className='flex items-center gap-2 text-lg font-bold text-slate-900'>
+                    <span className='grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-violet-600 to-pink-500 text-white'><Camera size={19}/></span>
+                    {!menu && <span>PicShare</span>}
+                </button>
+                <Menu className={`${menu ? 'absolute -right-3 top-3 rounded-full border bg-white p-1 shadow' : ''} h-5 w-5 cursor-pointer text-slate-400 hover:text-slate-800`} onClick={menuHandler} />
+            </div>
+            <div className='flex flex-col'>
                 <div className=''>
                     {
                         sidebarItems.map((item, index) => (
-                            <div onClick={() => sidebarHandler(item.text)} key={index} className='flex items-center gap-4 relative hover:bg-red-400 cursor-pointer rounded-lg p-3 my-3' >
+                            <div onClick={() => sidebarHandler(item.text)} key={index} className={`group relative my-1 flex cursor-pointer items-center gap-4 rounded-xl p-3 transition-colors hover:bg-violet-50 hover:text-violet-700 ${guest && ['Messages', 'Notifications', 'Create', 'Profile'].includes(item.text) ? 'opacity-45' : ''}`} >
                                 <span className={`${menu ? 'text-2xl' : 'block text-xl'}`}>{item.icon}</span>
-                                <span className={`${menu ? 'hidden' : 'block'}`}>{item.text}</span>
+                                <span className={`${menu ? 'hidden' : 'block'} text-sm font-medium`}>{item.text}</span>
                                 {
                                     item.text === 'Notifications' && likeNotification?.length > 0 && (
                                         <Popover>

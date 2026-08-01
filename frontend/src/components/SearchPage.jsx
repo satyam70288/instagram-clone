@@ -1,15 +1,20 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { CircleX } from 'lucide-react';
-import { X } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { CircleX, X } from 'lucide-react';
 import { useSearchUserQuery } from '@/services/api';
-import { Link } from 'react-router-dom';
-import { server } from '@/constant/config';
+import { Link, useNavigate } from 'react-router-dom';
+import { resolveMediaUrl } from '@/lib/media';
+import { useSelector } from 'react-redux';
+import { toast } from 'sonner';
 
 const SearchPage = ({ searchActive, setSearchActive }) => {
     const modelRef = useRef();
+    const navigate = useNavigate();
+    const { guest, suggestedUsers } = useSelector((store) => store.auth);
     const [searchTerm, setSearchTerm] = useState('');
-    const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
-    const { data } = useSearchUserQuery(debouncedSearchTerm);
+    const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
+    const { data } = useSearchUserQuery(debouncedSearchTerm, {
+        skip: guest || !debouncedSearchTerm.trim(),
+    });
 
     const searchHandler = (e) => {
         setSearchTerm(e.target.value);
@@ -24,65 +29,76 @@ const SearchPage = ({ searchActive, setSearchActive }) => {
     useEffect(() => {
         const handler = setTimeout(() => {
             setDebouncedSearchTerm(searchTerm);
-            console.log(searchTerm);
-        }, 1000);
-
-        return () => {
-            clearTimeout(handler);
-        };
+        }, 400);
+        return () => clearTimeout(handler);
     }, [searchTerm]);
 
     useEffect(() => {
         document.addEventListener('mousedown', closeModel);
-
-        return () => {
-            document.removeEventListener('mousedown', closeModel);
-        };
+        return () => document.removeEventListener('mousedown', closeModel);
     }, []);
+
+    const results = useMemo(() => {
+        if (guest) {
+            const q = debouncedSearchTerm.trim().toLowerCase();
+            if (!q) return suggestedUsers || [];
+            return (suggestedUsers || []).filter((u) => u.username?.toLowerCase().includes(q));
+        }
+        return data?.users || [];
+    }, [guest, suggestedUsers, debouncedSearchTerm, data]);
 
     return (
         <div
             ref={modelRef}
-            className={`fixed inset-0 h-full backdrop-blur-sm bg-black p-5 rounded-lg overflow-auto z-0 
-            transition-all duration-500 ease-in-out ${searchActive ? 'ml-[10%] w-[50%] opacity-100' : 'w-0 opacity-0'} `}
+            className={`fixed inset-y-0 left-[16%] z-20 h-full w-[min(420px,50%)] overflow-auto rounded-r-2xl border-r border-slate-200 bg-white p-5 shadow-xl
+            transition-all duration-300 ${searchActive ? 'opacity-100' : 'pointer-events-none w-0 opacity-0'} `}
         >
-            <div className='flex flex-col gap-10'>
-                <div className='flex justify-between'>
-                    <h1 className='text-white font-bold text-4xl'>Search</h1>
-                    <CircleX className='w-16 h-10 cursor-pointer' onClick={() => setSearchActive(false)} />
+            <div className='flex flex-col gap-8'>
+                <div className='flex justify-between items-center'>
+                    <h1 className='text-slate-900 font-bold text-2xl'>Search</h1>
+                    <CircleX className='w-8 h-8 cursor-pointer text-slate-400' onClick={() => setSearchActive(false)} />
                 </div>
-                <div className='flex items-center gap-3 w-[90%] rounded-lg bg-gray-700 p-3 mx-auto'>
+                {guest && (
+                    <p className='rounded-xl bg-violet-50 px-3 py-2 text-sm text-violet-700'>
+                        Guest search shows demo people only.{' '}
+                        <button className='font-semibold underline' onClick={() => { setSearchActive(false); navigate('/login'); toast.info('Log in for full search.'); }}>Log in</button>
+                    </p>
+                )}
+                <div className='flex items-center gap-3 w-full rounded-xl bg-slate-100 p-3'>
                     <input
-                        className='w-full outline-none border-none bg-transparent text-white'
+                        className='w-full outline-none border-none bg-transparent text-slate-800'
                         type="text"
-                        placeholder='Search'
+                        placeholder='Search people'
                         value={searchTerm}
                         onChange={searchHandler}
                     />
-                    <button className='text-white'>
-                        <CircleX onClick={() => setSearchTerm('')} />
+                    <button type='button' className='text-slate-400' onClick={() => setSearchTerm('')}>
+                        <CircleX />
                     </button>
                 </div>
             </div>
-            <hr className='border-t border-gray-500 mt-10' />
-            <div>
-                <div className='flex justify-between p-4'>
-                    <h1 className='text-white text-2xl font-bold'>Recent</h1>
-                    <p className='text-xl text-blue-600 cursor-pointer'>Clear all</p>
-                </div>
-                <div className='flex flex-col gap-6'>
-                    {data?.users.map((user) => (
-                        <Link to={`/profile/${user._id}`} key={user._id}>
-                            <div className='flex items-center gap-4 justify-between'>
-                                <div className='w-12 h-12 overflow-hidden rounded-full'>
-                                    <img src={`${server}/${user.profilePicture}`} alt="" />
-                                </div>
-                                <p>{user.username}</p>
-                                <p><X /></p>
-                            </div>
-                        </Link>
-                    ))}
-                </div>
+            <hr className='border-t border-slate-100 mt-6' />
+            <div className='mt-4 flex flex-col gap-3'>
+                {results.map((user) => (
+                    <Link
+                        to={guest ? '/login' : `/profile/${user._id}`}
+                        key={user._id}
+                        onClick={() => setSearchActive(false)}
+                        className='flex items-center gap-3 rounded-xl p-2 hover:bg-violet-50'
+                    >
+                        <div className='w-11 h-11 overflow-hidden rounded-full bg-slate-100'>
+                            <img src={resolveMediaUrl(user.profilePicture)} alt="" className='h-full w-full object-cover' />
+                        </div>
+                        <div className='flex-1'>
+                            <p className='font-semibold text-slate-800'>{user.username}</p>
+                            <p className='text-xs text-slate-500 line-clamp-1'>{user.bio || 'PicShare user'}</p>
+                        </div>
+                        <X className='h-4 w-4 text-slate-300' />
+                    </Link>
+                ))}
+                {!results.length && debouncedSearchTerm && (
+                    <p className='text-center text-sm text-slate-400 py-8'>No users found</p>
+                )}
             </div>
         </div>
     );

@@ -1,44 +1,43 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar'
-import React from 'react'
 import { Link } from 'react-router-dom'
 import { Button } from './ui/button'
 import useGetAllMessage from '@/hooks/useGetAllMessage'
 import { useSelector } from 'react-redux'
 import useGetRTM from '@/hooks/useGetRTM'
-
+import { resolveMediaUrl } from '@/lib/media'
 
 const Messages = ({ selectedUser }) => {
     useGetRTM()
     useGetAllMessage(selectedUser?._id)
-    const {messages}=useSelector((state)=>state.chat)
-    const {user}=useSelector((state)=>state.auth)
+    const { messages } = useSelector((state) => state.chat)
+    const { user } = useSelector((state) => state.auth)
     return (
-        <div className='overflow-y-auto flex-1 p-4 bg-slate-400'>
+        <div className='overflow-y-auto flex-1 p-4 bg-slate-100'>
             <div className='flex justify-center'>
                 <div className='flex flex-col items-center'>
-                    <Avatar>
-                        <AvatarImage src={selectedUser?.profilePicture} />
+                    <Avatar className='h-16 w-16 overflow-hidden rounded-full'>
+                        <AvatarImage src={resolveMediaUrl(selectedUser?.profilePicture)} className='h-full w-full object-cover' />
                         <AvatarFallback>CN</AvatarFallback>
                     </Avatar>
-                    <span>{selectedUser?.username}</span>
-                    <Link to={`profile/${selectedUser?._id}`}><Button className='h-8 my-2 rounded-md' variant='secondary'>View Profile</Button></Link>
+                    <span className='mt-2 font-semibold'>{selectedUser?.username}</span>
+                    <Link to={`/profile/${selectedUser?._id}`}>
+                        <Button className='h-8 my-2 rounded-md' variant='secondary'>View Profile</Button>
+                    </Link>
                 </div>
-
             </div>
-      <div className="flex flex-col gap-3">
-        {messages?.map((Msg) => (
-          <div
-            key={Msg._id}
-            className={`flex ${Msg.senderId === user?._id ? 'justify-end' : 'justify-start'}`}
-          >
-            <div className={`max-w-xs w-fit break-words rounded-lg p-2 ${Msg.senderId === user?._id ? 'bg-blue-500 text-white' : 'bg-gray-300 text-black'}`}>
-              {Msg.message}
+            <div className="flex flex-col gap-3">
+                {messages?.map((Msg) => (
+                    <div
+                        key={Msg._id}
+                        className={`flex ${Msg.senderId === user?._id ? 'justify-end' : 'justify-start'}`}
+                    >
+                        <div className={`max-w-xs w-fit break-words rounded-lg p-2 ${Msg.senderId === user?._id ? 'bg-violet-600 text-white' : 'bg-white border text-slate-800'}`}>
+                            {Msg.message}
+                        </div>
+                    </div>
+                ))}
             </div>
-          </div>
-        ))}
-      </div>
-    </div>
-
+        </div>
     )
 }
 

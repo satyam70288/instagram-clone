@@ -1,71 +1,78 @@
-import { server } from '@/constant/config';
 import { useExplorePostQuery } from '@/services/api';
-import React from 'react';
 import { useSelector } from 'react-redux';
-import { Link } from 'react-router-dom'; // Import Link from react-router-dom
+import { Link, useNavigate } from 'react-router-dom';
+import { resolveMediaUrl } from '@/lib/media';
+import { toast } from 'sonner';
 
 const Explore = () => {
-  const { data, refetch } = useExplorePostQuery(undefined, {
-    refetchOnMountOrArgChange: true, // Refetch on component mount
-    refetchOnWindowFocus: true, // Refetch when window regains focus
-  });
+  const { guest, posts: guestPosts } = useSelector(store => store.auth)
   const { menu } = useSelector(store => store.menu)
+  const navigate = useNavigate();
+  const { data, isLoading, isError } = useExplorePostQuery(undefined, {
+    skip: Boolean(guest),
+    refetchOnMountOrArgChange: true,
+  });
 
-  const isVideo = (url) => {
-    // Check if URL ends with common video file extensions
-    return url.endsWith('.mp4') || url.endsWith('.mov') || url.endsWith('.avi');
-  };
-  const isPdf = (fileName) => {
-    return fileName?.toLowerCase().endsWith('.pdf');
-  };
+  const posts = guest ? (guestPosts || []) : (data?.posts || []);
+
+  const isVideo = (url) => url?.endsWith('.mp4') || url?.endsWith('.mov') || url?.endsWith('.avi');
+  const isPdf = (fileName) => fileName?.toLowerCase().endsWith('.pdf');
+
+  if (!guest && isLoading) {
+    return <div className='flex min-h-screen items-center justify-center'>Loading explore...</div>;
+  }
+
+  if (!guest && isError) {
+    return <div className='flex min-h-screen items-center justify-center text-red-500'>Failed to load explore posts.</div>;
+  }
 
   return (
     <div
       className={`
-    transition-all duration-500 h-screen overflow-y-auto bg-gray-900 p-2
+    transition-all duration-500 min-h-screen overflow-y-auto bg-[#f7f7fb] p-2
     ${menu ?
-          'ml-[5%] w-[calc(100%-5%)] sm:ml-[8%] sm:w-[calc(100%-8%)] md:ml-[15%] md:w-[calc(100%-15%)] lg:ml-[6%] lg:w-[calc(100%-6%)]'
+          'ml-0 lg:ml-[6%] lg:w-[calc(100%-6%)]'
           :
-          'ml-[16%] w-[calc(100%-16%)] sm:ml-[14%] sm:w-[calc(100%-14%)] md:ml-[25%] md:w-[calc(100%-25%)] lg:ml-[16%] lg:w-[calc(100%-16%)]'
+          'ml-0 lg:ml-[16%] lg:w-[calc(100%-16%)]'
         }
   `}
     >
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-4 p-4">
-        {data?.posts.map((item) => (
+      {guest && (
+        <div className='mx-auto mb-4 max-w-4xl rounded-xl border border-violet-100 bg-white px-4 py-3 text-sm text-slate-600'>
+          Guest preview of Explore. <button className='font-semibold text-violet-600' onClick={() => { toast.info('Create an account for the full feed.'); navigate('/login'); }}>Log in</button> for live posts.
+        </div>
+      )}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
+        {posts.map((item) => (
           <Link
             key={item._id}
-            to={`/post/${item._id}`} // Change this path based on your routing setup
-            className="relative block overflow-hidden rounded-lg shadow-lg transition-transform transform hover:scale-105"
+            to={`/post/${item._id}`}
+            className="relative block overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-transform hover:scale-[1.02]"
           >
             {isVideo(item?.image) ? (
               <video
-                className='rounded-md my-2 w-full aspect-square object-cover'
-                controls
-                src={`${server}/${item?.image.replace(/\\/g, '/')}`}
-                alt="item_video"
+                className='w-full aspect-square object-cover'
+                muted
+                src={resolveMediaUrl(item?.image)}
               />
-            ) : isPdf(item?.image) ? ( // Check if the file is a PDF
+            ) : isPdf(item?.image) ? (
               <embed
-                className='rounded-md my-2 w-full aspect-square'
-                src={`${server}/${item?.image.replace(/\\/g, '/')}`}
+                className='w-full aspect-square'
+                src={resolveMediaUrl(item?.image)}
                 type="application/pdf"
-                width="100%"
-                height="350px" // Adjust the height as needed
-                alt="item_pdf"
               />
             ) : (
               <img
-                className='rounded-md my-2 w-full aspect-square object-cover'
-                src={`${server}/${item?.image.replace(/\\/g, '/')}`}
-                alt="post_image"
+                className='w-full aspect-square object-cover'
+                src={resolveMediaUrl(item?.image)}
+                alt="post"
               />
             )}
-
-            <div className="absolute inset-0 bg-pink-50 bg-opacity-30 opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-              <p className="text-white text-lg font-semibold p-2">{item.content}</p>
-            </div>
           </Link>
         ))}
+        {!posts.length && (
+          <p className='col-span-full text-center text-slate-400 py-20'>No posts to explore yet.</p>
+        )}
       </div>
     </div>
   );

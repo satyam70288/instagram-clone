@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Dialog, DialogContent, DialogTrigger } from './ui/dialog';
 import { Bookmark, MessageCircle, MoreHorizontal, Send } from 'lucide-react';
@@ -10,7 +10,7 @@ import { toast } from 'sonner';
 import { setPosts, setSelectedPost } from '@/redux/postSlice';
 import { Badge } from './ui/badge';
 import CommentDialogu from './CommentDialogu';
-import { server } from '@/constant/config';
+import { resolveMediaUrl } from '@/lib/media';
 
 const PostData = ({ post }) => {
     const [text, setText] = useState("");
@@ -18,14 +18,17 @@ const PostData = ({ post }) => {
     const { user, guest } = useSelector(store => store.auth);
     const { posts } = useSelector(store => store.post);
     // Set default values if user is not logged in
-    const [liked, setLiked] = useState(user ? post?.likes.includes(user?._id) : false);
-    const [postLike, setPostLike] = useState(user ? post?.likes.length : 0);
-    const [comment, setComment] = useState(user ? post?.comments : []);
+    const [liked, setLiked] = useState(Boolean(post?.likes?.includes(user?._id)));
+    const [postLike, setPostLike] = useState(post?.likes?.length || 0);
+    const [comment, setComment] = useState(post?.comments || []);
     const dispatch = useDispatch();
-    const isFollowing = user ? post?.author?.followers.includes(user?._id) : false;
+    const isFollowing = Boolean(post?.author?.followers?.includes(user?._id));
+    const requireAccount = () => {
+        toast.info('Create an account or log in to interact with posts.');
+    };
     const isVideo = (url) => {
         // Check if URL ends with common video file extensions
-        return url.endsWith('.mp4') || url.endsWith('.mov') || url.endsWith('.avi');
+        return url?.endsWith('.mp4') || url?.endsWith('.mov') || url?.endsWith('.avi');
     };
     const isPdf = (fileName) => {
         return fileName?.toLowerCase().endsWith('.pdf');
@@ -37,6 +40,7 @@ const PostData = ({ post }) => {
     };
 
     const likeOrDislikeHandler = async () => {
+        if (guest) return requireAccount();
         try {
             const action = liked ? 'dislike' : 'like';
             const res = await axios.get(`/api/v1/post/${post?._id}/${action}`, { withCredentials: true });
@@ -60,6 +64,7 @@ const PostData = ({ post }) => {
     };
 
     const commentHandler = async () => {
+        if (guest) return requireAccount();
         try {
             const res = await axios.post(`/api/v1/post/${post?._id}/comment`, { text }, {
                 headers: { 'Content-Type': 'application/json' },
@@ -106,12 +111,10 @@ const PostData = ({ post }) => {
     };
 
     const bookmarkHandler = async () => {
+        if (guest) return requireAccount();
         try {
             const res = await axios.get(`/api/v1/post/${post?._id}/bookmark`, {
                 withCredentials: true,
-                headers: {
-                    Authorization: `Bearer ${token}`, // Include the token in the Authorization header
-                },
             });
             if (res.data.success) {
                 toast.success(res.data.message);
@@ -122,6 +125,7 @@ const PostData = ({ post }) => {
     };
 
     const followOrUnfollowHandler = async (id) => {
+        if (guest) return requireAccount();
         try {
             const res = await axios.post(`/api/v1/user/followorunfollow/${id}`, {}, {
                 withCredentials: true,
@@ -134,7 +138,7 @@ const PostData = ({ post }) => {
                 const isCurrentlyFollowing = post?.author?.followers.includes(user?._id);
                 const updatedAuthorFollowers = isCurrentlyFollowing
                     ? post.author.followers.filter(followerId => followerId !== user?._id)
-                    : [...post?.author?.followers, user?._id];
+                    : [...(post?.author?.followers || []), user?._id];
 
                 const updatedPosts = posts.map(postItem =>
                     postItem._id === post?._id
@@ -153,19 +157,19 @@ const PostData = ({ post }) => {
     };
 
     return (
-        <div className=' my-8 w-full max-w-xs sm:max-w-sm md:max-w-md mx-auto border p-4 border-gray-300 bg-white rounded-lg shadow-lg'>
+        <article className='w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-shadow hover:shadow-md'>
             {/* Post Header and Avatar */}
-            <div className='flex items-center justify-between'>
+            <div className='flex items-center justify-between px-4 py-3.5'>
                 <div className='flex items-center gap-2'>
                     <Avatar>
                         <AvatarImage
-                            src={`${server}/${post?.author?.profilePicture?.replace(/\\/g, '/')}`}
+                            src={resolveMediaUrl(post?.author?.profilePicture)}
                         />
 
                         <AvatarFallback>CN</AvatarFallback>
                     </Avatar>
                     <div className='flex items-center gap-3'>
-                        <h1 className='font-semibold text-gray-700'>{post?.author?.username}</h1>
+                        <h1 className='text-sm font-semibold text-slate-800'>{post?.author?.username}</h1>
                         {user?._id === post?.author?._id && <Badge variant="secondary">Author</Badge>}
                     </div>
                 </div>
@@ -180,7 +184,7 @@ const PostData = ({ post }) => {
                                 {isFollowing ? 'Unfollow' : 'Follow'}
                             </Button>
                         )}
-                        <Button variant='ghost' className="cursor-pointer w-fit">Add to favorites</Button>
+                        <Button variant='ghost' className="cursor-pointer w-fit" onClick={() => toast.info('Favorites coming soon.')}>Add to favorites</Button>
                         {user && user?._id === post?.author?._id && (
                             <Button onClick={deletePostHandler} variant='ghost' className="cursor-pointer w-fit">Delete</Button>
                         )}
@@ -190,46 +194,42 @@ const PostData = ({ post }) => {
 
             {/* Post Image/Video/PDF */}
             {isVideo(post?.image) ? (
-                <video className='rounded-md my-2 w-full aspect-square object-cover' controls src={`${server}/${post?.image.replace(/\\/g, '/')}`} alt="post_video" />
+                <video className='w-full aspect-square object-cover bg-slate-100' controls src={resolveMediaUrl(post?.image)} alt="post_video" />
             ) : isPdf(post?.image) ? (
-                <embed className='rounded-md my-2 w-full aspect-square' src={`${server}/${post?.image.replace(/\\/g, '/')}`} type="application/pdf" width="100%" height="400px" alt="post_pdf" />
+                <embed className='w-full aspect-square' src={resolveMediaUrl(post?.image)} type="application/pdf" width="100%" height="400px" alt="post_pdf" />
             ) : (
                 <img
-                    className="rounded-md my-2 w-full aspect-square object-cover"
-                    src={guest ? post?.image : `${server}/${post?.image?.replaceAll('\\', '/')}`}
+                    className="w-full aspect-square bg-slate-100 object-cover"
+                    src={resolveMediaUrl(post?.image)}
                     alt="post_image"
-                    onLoad={() => {
-                        const imageUrl = guest ? post?.image : `${server}/${post?.image?.replaceAll('\\', '/')}`;
-                        console.log(`Image URL: ${imageUrl}`);
-                    }}
-                    onError={(e) => {
-                        console.error('Image failed to load', e);
-                    }}
                 />
             )}
 
             {/* Post Likes, Comments, and Action Buttons */}
-            <div className='flex items-center justify-between my-2'>
+            <div className='flex items-center justify-between px-4 pt-4'>
                 <div className='flex items-center gap-3'>
                     {liked
                         ? <FaHeart onClick={likeOrDislikeHandler} size={'24'} className='cursor-pointer text-red-600' />
                         : <FaRegHeart onClick={likeOrDislikeHandler} size={'22px'} className='cursor-pointer hover:text-gray-600' />
                     }
                     <MessageCircle onClick={() => {
+                        if (guest) return requireAccount();
                         dispatch(setSelectedPost(post));
                         setOpen(true);
                     }} className='cursor-pointer hover:text-gray-600' />
-                    <Send className='cursor-pointer hover:text-gray-600' />
+                    <Send onClick={guest ? requireAccount : undefined} className='cursor-pointer hover:text-violet-600' />
                 </div>
-                <Bookmark onClick={bookmarkHandler} className='cursor-pointer hover:text-gray-600' />
+                <Bookmark onClick={bookmarkHandler} className='cursor-pointer hover:text-violet-600' />
             </div>
-            <span className='font-medium block mb-2 text-gray-800'>{postLike} likes</span>
-            <p className='text-gray-700'>
+            <div className='px-4 pb-4 pt-2'>
+            <span className='mb-1 block text-sm font-semibold text-slate-800'>{postLike} likes</span>
+            <p className='text-sm leading-6 text-slate-700'>
                 <span className='font-medium mr-2'>{post?.author?.username}</span>
                 {post?.caption}
             </p>
             {comment.length > 0 && (
                 <span onClick={() => {
+                    if (guest) return requireAccount();
                     dispatch(setSelectedPost(post));
                     setOpen(true);
                 }} className='cursor-pointer text-sm text-gray-500 hover:text-gray-700'>
@@ -237,17 +237,20 @@ const PostData = ({ post }) => {
                 </span>
             )}
             <CommentDialogu open={open} setOpen={setOpen} />
-            <div className='flex items-center justify-between'>
+            <div className='mt-3 flex items-center justify-between border-t border-slate-100 pt-3'>
                 <input
                     type="text"
-                    placeholder='Add a comment...'
+                    placeholder={guest ? 'Log in to add a comment' : 'Add a comment...'}
                     value={text}
                     onChange={changeEventHandler}
-                    className='outline-none text-sm w-full border p-2 rounded-md border-gray-300'
+                    onClick={guest ? requireAccount : undefined}
+                    readOnly={guest}
+                    className='w-full bg-transparent text-sm outline-none placeholder:text-slate-400'
                 />
                 {text && <span onClick={commentHandler} className='text-[#3BADF8] cursor-pointer font-semibold'>Post</span>}
             </div>
-        </div>
+            </div>
+        </article>
     );
 };
 
