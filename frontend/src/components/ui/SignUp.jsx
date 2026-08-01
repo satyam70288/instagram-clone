@@ -8,6 +8,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { enableGuestMode } from '@/redux/authSlice';
 import { Camera } from 'lucide-react';
+import GoogleAuthButton from '@/components/GoogleAuthButton';
 
 const SignUp = () => {
   const navigate = useNavigate()
@@ -127,6 +128,10 @@ const SignUp = () => {
           />
         </div>
         <Button className='h-12 rounded-xl bg-gradient-to-r from-violet-600 to-pink-500 text-base font-semibold shadow-lg shadow-violet-200 hover:opacity-90' type="submit" disabled={loading}>{loading ? 'Creating account...' : 'Create account'}</Button>
+        <div className='flex items-center gap-3 text-xs font-medium uppercase tracking-wider text-slate-400'>
+          <span className='h-px flex-1 bg-slate-200' /> or <span className='h-px flex-1 bg-slate-200' />
+        </div>
+        <GoogleAuthButton onBusyChange={setLoading} />
         <Button type='button' variant='outline' onClick={handleGuestAccess} className='h-12 rounded-xl border-slate-200'>Explore as guest</Button>
         <p className='text-center text-sm text-slate-500'>Already have an account? <Link className='font-semibold text-violet-600 hover:text-violet-700' to='/login'>Log in</Link></p>
       </form>

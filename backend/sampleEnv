@@ -1,5 +1,10 @@
-MONGO_URI=mongodb+srv://satyamb971:tqEKEmhQxoThsRnm@cluster0.en2eu.mongodb.net/
-# MONGO_URI=mongodb+srv://satyamb971:tqEKEmhQxoThsRnm@cluster0.en2eu.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
-# MONGO_URI=mongodb://127.0.0.1:27017/instagramClone
+MONGO_URI=your_mongodb_uri
 PORT=8000
-SECRET_KEY=SATYAMBHARTI
+SECRET_KEY=your_jwt_secret
+FRONTEND_URL=http://localhost:5173
+
+# Google OAuth (Client ID is okay in sample; never commit real Client Secret)
+GOOGLE_CLIENT_ID=your_google_oauth_client_id.apps.googleusercontent.com
+# GOOGLE_CLIENT_SECRET is only needed for server-side callback OAuth (e.g. swagfashion).
+# For this Instagram clone Google button flow, secret is NOT required.
+# GOOGLE_CLIENT_SECRET=your_google_client_secret

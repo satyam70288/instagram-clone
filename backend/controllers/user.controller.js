@@ -142,6 +142,14 @@ export const login = async (req, res) => {
             });
         }
 
+        // Google-only accounts have no local password
+        if (!user.password) {
+            return res.status(401).json({
+                message: "This account uses Google Sign-In. Please continue with Google.",
+                success: false,
+            });
+        }
+
         // Check if the password matches
         const isPasswordMatch = await bcrypt.compare(password, user.password);
         if (!isPasswordMatch) {
@@ -389,6 +397,125 @@ export const searchUser = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server error' });
+    }
+};
+
+/**
+ * Google Sign-In:
+ * 1) Frontend sends Google ID token
+ * 2) Backend verifies it with Google
+ * 3) Find or create user
+ * 4) Issue our own JWT (same as normal login)
+ */
+export const googleLogin = async (req, res) => {
+    try {
+        const { credential } = req.body;
+        if (!credential) {
+            return res.status(400).json({
+                success: false,
+                message: 'Google credential is required.',
+            });
+        }
+
+        if (!process.env.GOOGLE_CLIENT_ID) {
+            return res.status(500).json({
+                success: false,
+                message: 'Google login is not configured on the server.',
+            });
+        }
+
+        const { OAuth2Client } = await import('google-auth-library');
+        const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+        const ticket = await client.verifyIdToken({
+            idToken: credential,
+            audience: process.env.GOOGLE_CLIENT_ID,
+        });
+        const payload = ticket.getPayload();
+
+        if (!payload?.email || !payload?.email_verified) {
+            return res.status(401).json({
+                success: false,
+                message: 'Google account email is not verified.',
+            });
+        }
+
+        const { sub: googleId, email, name, picture } = payload;
+        let user = await User.findOne({
+            $or: [{ email }, { googleId }],
+        }).populate('posts');
+
+        if (!user) {
+            const baseUsername = (email.split('@')[0] || 'user')
+                .replace(/[^a-zA-Z0-9._]/g, '')
+                .slice(0, 18) || 'user';
+            let username = baseUsername;
+            let attempt = 0;
+            while (await User.findOne({ username })) {
+                attempt += 1;
+                username = `${baseUsername}${Math.floor(100 + Math.random() * 900)}`;
+                if (attempt > 8) {
+                    username = `user${Date.now().toString().slice(-8)}`;
+                    break;
+                }
+            }
+
+            user = await User.create({
+                username,
+                email,
+                googleId,
+                authProvider: 'google',
+                password: null,
+                profilePicture: picture || '',
+                bio: name ? `Hi, I'm ${name}` : '',
+                lastLoginAt: Date.now(),
+            });
+            user = await User.findById(user._id).populate('posts');
+        } else {
+            // Link Google to an existing email/password account
+            if (!user.googleId) user.googleId = googleId;
+            if (user.authProvider === 'local') user.authProvider = 'both';
+            if (!user.profilePicture && picture) user.profilePicture = picture;
+            user.lastLoginAt = Date.now();
+            await user.save();
+        }
+
+        const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: '1d' });
+        const isProd = process.env.NODE_ENV === 'production';
+        const cookieOptions = {
+            httpOnly: true,
+            sameSite: isProd ? 'None' : 'Lax',
+            secure: isProd,
+            maxAge: 24 * 60 * 60 * 1000,
+        };
+
+        const userData = {
+            _id: user._id,
+            username: user.username,
+            email: user.email,
+            profilePicture: user.profilePicture,
+            bio: user.bio,
+            followers: user.followers,
+            following: user.following,
+            posts: user.posts,
+            lastLoginAt: user.lastLoginAt,
+            authProvider: user.authProvider,
+        };
+
+        return res
+            .header('Authorization', `Bearer ${token}`)
+            .cookie('token', token, cookieOptions)
+            .json({
+                success: true,
+                message: `Welcome ${user.username}`,
+                user: userData,
+                token,
+            });
+    } catch (error) {
+        console.error('Google login error:', error);
+        return res.status(401).json({
+            success: false,
+            message: 'Google login failed. Invalid or expired Google token.',
+        });
     }
 };
 

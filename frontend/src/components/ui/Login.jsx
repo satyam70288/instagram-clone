@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setAuthUser,enableGuestMode } from '@/redux/authSlice';
 import { Camera, Compass, Heart, Users } from 'lucide-react';
 import { saveAuthToken } from '@/lib/authStorage';
+import GoogleAuthButton from '@/components/GoogleAuthButton';
 
 const Login = () => {
   const dispatch = useDispatch()
@@ -125,6 +126,7 @@ const Login = () => {
         <div className='flex items-center gap-3 text-xs font-medium uppercase tracking-wider text-slate-400'>
           <span className='h-px flex-1 bg-slate-200' /> or <span className='h-px flex-1 bg-slate-200' />
         </div>
+        <GoogleAuthButton onBusyChange={setLoading} />
         <Button type='button' variant='outline' onClick={handleGuestAccess} className='h-auto min-h-12 rounded-xl border-slate-200 py-3'>
           <span><strong className='block text-slate-800'>Explore as a guest</strong><small className='font-normal text-slate-500'>No account needed · Browse only</small></span>
         </Button>
