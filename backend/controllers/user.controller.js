@@ -417,18 +417,19 @@ export const googleLogin = async (req, res) => {
             });
         }
 
-        if (!process.env.GOOGLE_CLIENT_ID) {
+        const googleClientId = (process.env.GOOGLE_CLIENT_ID || '').trim();
+        if (!googleClientId) {
             return res.status(500).json({
                 success: false,
-                message: 'Google login is not configured on the server.',
+                message: 'Google login is not configured on the server. Set GOOGLE_CLIENT_ID on backend.',
             });
         }
 
         const { OAuth2Client } = await import('google-auth-library');
-        const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+        const client = new OAuth2Client(googleClientId);
         const ticket = await client.verifyIdToken({
             idToken: credential,
-            audience: process.env.GOOGLE_CLIENT_ID,
+            audience: googleClientId,
         });
         const payload = ticket.getPayload();
 
@@ -511,7 +512,15 @@ export const googleLogin = async (req, res) => {
                 token,
             });
     } catch (error) {
-        console.error('Google login error:', error);
+        console.error('Google login error:', error?.message || error);
+        const detail = error?.message || '';
+        // Audience mismatch usually means Render GOOGLE_CLIENT_ID != frontend Client ID
+        if (/audience|Wrong recipient|invalid token signature|Token used too/i.test(detail)) {
+            return res.status(401).json({
+                success: false,
+                message: 'Google token verification failed. Check that backend GOOGLE_CLIENT_ID matches the frontend Client ID.',
+            });
+        }
         return res.status(401).json({
             success: false,
             message: 'Google login failed. Invalid or expired Google token.',
