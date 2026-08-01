@@ -6,9 +6,9 @@ import { useDispatch, useSelector } from "react-redux";
 
 const useGetSuggestedUsers = () => {
     const dispatch = useDispatch();
-    const { guest } = useSelector((store) => store.auth);
+    const { guest, user } = useSelector((store) => store.auth);
     useEffect(() => {
-        if (guest) return;
+        if (guest || !user) return;
         const fetchSuggestedUsers = async () => {
             try {
                 const res = await axios.get('/api/v1/user/suggested', { withCredentials: true });
@@ -20,6 +20,6 @@ const useGetSuggestedUsers = () => {
             }
         }
         fetchSuggestedUsers();
-    }, [dispatch, guest]);
+    }, [dispatch, guest, user]);
 };
 export default useGetSuggestedUsers;

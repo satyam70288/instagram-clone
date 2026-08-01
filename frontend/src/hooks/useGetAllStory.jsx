@@ -5,9 +5,9 @@ import { useDispatch, useSelector } from "react-redux";
 
 const useGetAllStory = () => {
     const dispatch = useDispatch();
-    const { guest } = useSelector((store) => store.auth);
+    const { guest, user } = useSelector((store) => store.auth);
     useEffect(() => {
-        if (guest) return;
+        if (guest || !user) return;
         const fetchAllStory = async () => {
             try {
                 const res = await axios.get(`/api/v1/story/get/`, { withCredentials: true });
@@ -19,6 +19,6 @@ const useGetAllStory = () => {
             }
         }
         fetchAllStory();
-    }, [dispatch, guest]);
+    }, [dispatch, guest, user]);
 };
 export default useGetAllStory;

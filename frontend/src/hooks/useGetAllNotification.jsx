@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 const useGetAllNotification = () => {
   const dispatch = useDispatch();
-  const { guest } = useSelector((store) => store.auth);
+  const { guest, user } = useSelector((store) => store.auth);
 
   // Step 1: Create state variables within the hook
   const [notifications, setNotifications] = useState([]);
@@ -13,7 +13,7 @@ const useGetAllNotification = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (guest) {
+    if (guest || !user) {
       setLoading(false);
       return;
     }
@@ -39,7 +39,7 @@ const useGetAllNotification = () => {
     };
       fetchAllNotifications();
     
-  }, [dispatch, guest]);
+  }, [dispatch, guest, user]);
 
   // Step 2: Return the state variables from the custom hook
   return { notifications, loading, error };

@@ -6,9 +6,9 @@ import { useDispatch, useSelector } from "react-redux";
 
 const useGetAllPost = () => {
     const dispatch = useDispatch();
-    const { guest } = useSelector((store) => store.auth);
+    const { guest, user } = useSelector((store) => store.auth);
     useEffect(() => {
-        if (guest) return;
+        if (guest || !user) return;
         const fetchAllPost = async () => {
             try {
                 const res = await axios.get('/api/v1/post/all', { withCredentials: true });
@@ -22,6 +22,6 @@ const useGetAllPost = () => {
             }
         }
         fetchAllPost();
-    }, [dispatch, guest]);
+    }, [dispatch, guest, user]);
 };
 export default useGetAllPost;
